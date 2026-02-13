@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   background: #D4FCFF;
+  font-family: sans-serif;
 }
 .contain {
   
@@ -14,4 +15,21 @@ h1 {
 p {
   margin-left: 10px;
   color: black;
+}
+
+nav {
+  
+}
+
+nav, ul {
+  background-color: #07D8FF;
+   height: 40px;
+}
+
+ul li {
+  list-style: none;
+  display: inline-block;
+  background-color: #07D8FF;
+  font-size: 20px;
+  margin-left: 50px;
 }
