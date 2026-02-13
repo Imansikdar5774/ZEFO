@@ -1,3 +1,17 @@
 *{
-  background-color: #C3C8FF;
+  margin: 0;
+  padding: 0;
+  background: #D4FCFF;
+}
+.contain {
+  
+}
+h1 {
+  text-align: center;
+  color: black;
+}
+
+p {
+  margin-left: 10px;
+  color: black;
 }
