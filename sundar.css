@@ -25,11 +25,40 @@ nav, ul {
   background-color: #07D8FF;
    height: 40px;
 }
+/* nav bar ka home, shop, contact design*/
 
 ul li {
   list-style: none;
   display: inline-block;
   background-color: #07D8FF;
+  color: white;
   font-size: 20px;
   margin-left: 50px;
+  position: relative;
+  top: 10px;
+}
+
+/* isme image dawnload karega */ 
+
+.photo img {
+  width: 100px;
+  height: 150px;
+  position: relative;
+  top: 10px;
+  left: 10px;
+}
+
+/* dawnload button */ 
+
+.dawnloadBtn .dawnload {
+  background-color: #3844CB;
+  width: 80px;
+  height: 40px;
+  color: #ffffff;
+  border: none;
+  position: relative;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+  font-size: 16px;
 }
