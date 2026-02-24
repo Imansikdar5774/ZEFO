@@ -1,20 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>course web</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Coding Courses</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        /* Tabs (Options) System */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background-color: #e0e6ed;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background-color: #3498db;
+            color: white;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+        }
+        .tab-btn:hover:not(.active) {
+            background-color: #d1d8e0;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Grid System */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border-top: 4px solid #3498db;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .card.premium {
+            border-top: 4px solid #f1c40f;
+            background: #fffdf5;
+        }
+        .card.personal {
+            border-top: 4px solid #e74c3c;
+        }
+        .card-header {
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+        }
+        .card-price {
+            font-size: 2em;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .card-price span {
+            font-size: 0.4em;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+        
+        /* List Styles */
+        .features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
+            flex-grow: 1;
+        }
+        .features li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .features li::before {
+            content: '✔';
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        /* Add-ons box */
+        .addons-box {
+            background-color: #f1f2f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        .addons-box p { margin: 5px 0; font-weight: bold; color: #e67e22; }
+        .addons-box ul { list-style: none; padding: 0; margin: 0; }
+        .addons-box li { margin-bottom: 5px; padding-left: 15px; position: relative; }
+        .addons-box li::before { content: '+'; position: absolute; left: 0; color: #e67e22; font-weight: bold; }
+
+        /* Button Styles */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px 0;
+            background-color: #5865F2; /* Discord Color */
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+            box-sizing: border-box;
+            margin-top: auto;
+        }
+        .btn:hover {
+            background-color: #4752C4;
+        }
+    </style>
 </head>
 <body>
-  <h1>Bijkar Program Yt</h1>
-  <hr />
-  <p>this course is vary importain</p>
-  <h3>join discard now</h3>
-  <a href="https://discord.gg/mpjrHZ9YE" target="
-  
-  
-  
-  _blank">discard link</a>
+
+<div class="container">
+    <h1>Level Up Your Coding Skills</h1>
+    <p class="subtitle">Choose your learning path and get started today.</p>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('biggest', this)">Biggest Plans</button>
+        <button class="tab-btn" onclick="openTab('premium', this)">Premium Plans</button>
+        <button class="tab-btn" onclick="openTab('python', this)">Python Course</button>
+        <button class="tab-btn" onclick="openTab('admission', this)">Admission Fee</button>
+    </div>
+
+    <div id="biggest" class="tab-content" style="display: block;">
+        <div class="pricing-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Biggest Plan</h3>
+                    <div class="card-price">₹149<span>/month</span></div>
+                </div>
+                <ul class="features">
+                    <li><strong>Syllabus:</strong> HTML Only</li>
+                    <li><strong>Videos:</strong> Normal + Upcoming</li>
+                </ul>
+                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Standard Plan</h3>
+                    <div class="card-price">₹429<span>/month</span></div>
+                </div>
+                <ul class="features">
+                    <li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li>
+                    <li><strong>Videos:</strong> Normal + Upcoming</li>
+                    <li><strong>Features:</strong> 2 Projects</li>
+                </ul>
+                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+            </div>
+
+            <div class="card personal">
+                <div class="card-header">
+                    <h3 class="card-title">Personally Plan</h3>
+                    <div class="card-price">₹799<span>/month</span></div>
+                </div>
+                <ul class="features">
+                    <li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li>
+                    <li><strong>Videos:</strong> Normal + Upcoming</li>
+                    <li><strong>Features:</strong> 5 Projects</li>
+                </ul>
+                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="premium" class="tab-content">
+        <div class="pricing-grid">
+            <div class="card premium">
+                <div class="card-header">
+                    <h3 class="card-title">Premium HTML</h3>
+                    <div class="card-price">₹429<span>/month</span></div>
+                </div>
+                <ul class="features">
+                    <li><strong>Syllabus:</strong> HTML Full Course</li>
+                    <li><strong>Videos:</strong> Normal + Upcoming</li>
+                    <li><strong>Features:</strong> 3 Projects</li>
+                    <li><strong>Exams:</strong> 2 (Theory + Practical)</li>
+                </ul>
+                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+            </div>
+
+            <div class="card premium">
+                <div class="card-header">
+                    <h3 class="card-title">Premium Full Stack</h3>
+                    <div class="card-price">₹2399<span>/month</span></div>
+                </div>
+                <ul class="features">
+                    <li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li>
+                    <li><strong>Videos:</strong> Normal + Upcoming</li>
+                    <li><strong>Features:</strong> 38 Projects</li>
+                    <li><strong>Daily Tasks:</strong> 3 Homework, 8 Practice</li>
+                    <li><strong>Exams:</strong> 14 (Theory + Practical)</li>
+                    <li><strong>Support:</strong> Full Doubt & Question Solving</li>
+                </ul>
+                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+            </div>
+
+            <div class="card personal premium">
+                <div class="card-header">
+                    <h3 class="card-title">Ultimate Personal</h3>
+                    <div class="card-price">₹3799<span>/month</span></div>
+                </div>
+                <ul class="features">
+                    <li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li>
+                    <li><strong>Videos:</strong> Normal + Upcoming</li>
+                    <li><strong>Advantage:</strong> Mere se sikh paoge</li>
+                    <li><strong>Features:</strong> 42 Projects</li>
+                    <li><strong>Daily Tasks:</strong> 8 Homework, 12 Practice</li>
+                    <li><strong>Exams:</strong> 21 (Theory + Practical)</li>
+                    <li><strong>Support:</strong> Full Doubt & Question Solving</li>
+                </ul>
+                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="python" class="tab-content">
+        <div class="pricing-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Bronze Plan</h3>
+                    <div class="card-price">₹129<span>/month</span></div>
+                </div>
+                <ul class="features">
+                    <li><strong>Syllabus:</strong> Basic Python</li>
+                    <li><strong>Features:</strong> 1 Project per class</li>
+                </ul>
+                <div class="addons-box">
+                    <p>Optional Add-ons:</p>
+                    <ul>
+                        <li>Extra Project / Homework: ₹19 each</li>
+                        <li>Project Fee: ₹29</li>
+                        <li>Exam Theory Fee: ₹39</li>
+                        <li>Exam Practical Fee: ₹49</li>
+                    </ul>
+                </div>
+                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="admission" class="tab-content">
+        <div class="pricing-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Bugged Admission</h3>
+                    <div class="card-price">₹199<span>/one-time</span></div>
+                </div>
+                <ul class="features">
+                    <li><strong>Applicable for:</strong> Biggest / Bugged Plans</li>
+                    <li><strong>Type:</strong> One-time registration fee</li>
+                </ul>
+                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Pay</a>
+            </div>
+
+            <div class="card premium">
+                <div class="card-header">
+                    <h3 class="card-title">Premium Admission</h3>
+                    <div class="card-price">₹499<span>/one-time</span></div>
+                </div>
+                <ul class="features">
+                    <li><strong>Applicable for:</strong> Premium Plans</li>
+                    <li><strong>Type:</strong> One-time registration fee</li>
+                </ul>
+                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Pay</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function openTab(tabName, element) {
+        // Hide all tab contents
+        let contents = document.getElementsByClassName("tab-content");
+        for (let i = 0; i < contents.length; i++) {
+            contents[i].style.display = "none";
+        }
+        
+        // Remove 'active' class from all buttons
+        let buttons = document.getElementsByClassName("tab-btn");
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove("active");
+        }
+        
+        // Show the selected tab and add 'active' class to the clicked button
+        document.getElementById(tabName).style.display = "block";
+        element.classList.add("active");
+    }
+</script>
+
 </body>
 </html>
