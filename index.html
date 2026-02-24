@@ -3,16 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Coding Courses</title>
+    <title>My Courses & Content</title>
     <style>
-        /* General Styles */
+        /* General Styles (Light Theme Default) */
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --subtitle-color: #7f8c8d;
+            --card-bg: #ffffff;
+            --card-title: #2c3e50;
+            --nav-bg: #2c3e50;
+            --tab-bg: #e0e6ed;
+            --tab-hover: #d1d8e0;
+            --premium-bg: #fffdf5;
+            --card-shadow: rgba(0,0,0,0.08);
+            --card-shadow-hover: rgba(0,0,0,0.15);
+        }
+
+        /* Dark Theme Variables */
+        body.dark-theme {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --subtitle-color: #aaaaaa;
+            --card-bg: #1e1e1e;
+            --card-title: #ffffff;
+            --nav-bg: #000000;
+            --tab-bg: #333333;
+            --tab-hover: #444444;
+            --premium-bg: #2a281e;
+            --card-shadow: rgba(255,255,255,0.05);
+            --card-shadow-hover: rgba(255,255,255,0.1);
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
-            color: #333;
+            transition: background-color 0.3s, color 0.3s;
         }
+        
+        /* Top Navigation Bar */
+        .top-nav {
+            background-color: var(--nav-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            transition: background-color 0.3s;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: #3498db;
+        }
+        .theme-btn {
+            background-color: transparent;
+            border: 1px solid white;
+            margin-left: auto; /* Pushes the button to the right side if there's space */
+        }
+        .theme-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -20,13 +84,13 @@
         }
         h1 {
             text-align: center;
-            color: #2c3e50;
+            color: var(--card-title);
             font-size: 2.5em;
             margin-bottom: 10px;
         }
         p.subtitle {
             text-align: center;
-            color: #7f8c8d;
+            color: var(--subtitle-color);
             margin-bottom: 40px;
             font-size: 1.1em;
         }
@@ -40,12 +104,12 @@
             flex-wrap: wrap;
         }
         .tab-btn {
-            background-color: #e0e6ed;
+            background-color: var(--tab-bg);
             border: none;
-            padding: 12px 30px;
-            font-size: 1.1em;
+            padding: 12px 25px;
+            font-size: 1.05em;
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--text-color);
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -56,7 +120,7 @@
             box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
         }
         .tab-btn:hover:not(.active) {
-            background-color: #d1d8e0;
+            background-color: var(--tab-hover);
         }
         .tab-content {
             display: none;
@@ -70,40 +134,35 @@
         /* Grid System */
         .pricing-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             margin-bottom: 40px;
         }
 
         /* Card Styles */
         .card {
-            background: #ffffff;
+            background: var(--card-bg);
             border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s;
             display: flex;
             flex-direction: column;
             border-top: 4px solid #3498db;
         }
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 20px var(--card-shadow-hover);
         }
-        .card.premium {
-            border-top: 4px solid #f1c40f;
-            background: #fffdf5;
-        }
-        .card.personal {
-            border-top: 4px solid #e74c3c;
-        }
-        .card-header {
-            margin-bottom: 20px;
-        }
+        .card.premium { border-top: 4px solid #f1c40f; background: var(--premium-bg); }
+        .card.personal { border-top: 4px solid #e74c3c; }
+        .card.minecraft { border-top: 4px solid #2ecc71; } /* Green for Minecraft */
+
+        .card-header { margin-bottom: 20px; }
         .card-title {
             font-size: 1.4em;
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--card-title);
             margin: 0 0 10px 0;
         }
         .card-price {
@@ -113,7 +172,7 @@
         }
         .card-price span {
             font-size: 0.4em;
-            color: #7f8c8d;
+            color: var(--subtitle-color);
             font-weight: normal;
         }
         
@@ -138,19 +197,6 @@
             font-weight: bold;
         }
 
-        /* Add-ons box */
-        .addons-box {
-            background-color: #f1f2f6;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-        }
-        .addons-box p { margin: 5px 0; font-weight: bold; color: #e67e22; }
-        .addons-box ul { list-style: none; padding: 0; margin: 0; }
-        .addons-box li { margin-bottom: 5px; padding-left: 15px; position: relative; }
-        .addons-box li::before { content: '+'; position: absolute; left: 0; color: #e67e22; font-weight: bold; }
-
         /* Button Styles */
         .btn {
             display: block;
@@ -170,163 +216,254 @@
         .btn:hover {
             background-color: #4752C4;
         }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 20px 15px; }
+            h1 { font-size: 2em; }
+            .top-nav { gap: 10px; justify-content: center; }
+            .theme-btn { margin-left: 0; width: 100%; text-align: center; }
+            .nav-link { font-size: 0.9em; padding: 6px 10px; }
+            .pricing-grid { grid-template-columns: 1fr; gap: 20px; }
+            .tab-btn { padding: 10px 15px; font-size: 0.95em; flex: 1 1 auto; }
+        }
     </style>
 </head>
 <body>
 
+<nav class="top-nav">
+    <a class="nav-link active" onclick="switchSection('bijkar-section', this)">Bijkar Program YT Course</a>
+    <a class="nav-link" onclick="switchSection('free-content-section', this)">Free Content Creation</a>
+    <button class="nav-link theme-btn" onclick="toggleTheme()" id="theme-icon">🌙 Dark Theme</button>
+</nav>
+
 <div class="container">
-    <h1>Level Up Your Coding Skills</h1>
-    <p class="subtitle">Choose your learning path and get started today.</p>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="openTab('biggest', this)">Biggest Plans</button>
-        <button class="tab-btn" onclick="openTab('premium', this)">Premium Plans</button>
-        <button class="tab-btn" onclick="openTab('python', this)">Python Course</button>
-        <button class="tab-btn" onclick="openTab('admission', this)">Admission Fee</button>
-    </div>
+    <div id="bijkar-section" class="main-section" style="display: block;">
+        <h1>Bijkar Program YT Course</h1>
+        <p class="subtitle">Choose your coding path and get started today.</p>
 
-    <div id="biggest" class="tab-content" style="display: block;">
-        <div class="pricing-grid">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Biggest Plan</h3>
-                    <div class="card-price">₹149<span>/month</span></div>
-                </div>
-                <ul class="features">
-                    <li><strong>Syllabus:</strong> HTML Only</li>
-                    <li><strong>Videos:</strong> Normal + Upcoming</li>
-                </ul>
-                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Standard Plan</h3>
-                    <div class="card-price">₹429<span>/month</span></div>
-                </div>
-                <ul class="features">
-                    <li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li>
-                    <li><strong>Videos:</strong> Normal + Upcoming</li>
-                    <li><strong>Features:</strong> 2 Projects</li>
-                </ul>
-                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
-            </div>
-
-            <div class="card personal">
-                <div class="card-header">
-                    <h3 class="card-title">Personally Plan</h3>
-                    <div class="card-price">₹799<span>/month</span></div>
-                </div>
-                <ul class="features">
-                    <li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li>
-                    <li><strong>Videos:</strong> Normal + Upcoming</li>
-                    <li><strong>Features:</strong> 5 Projects</li>
-                </ul>
-                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
-            </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('biggest', this, 'bijkar')">Biggest Plans</button>
+            <button class="tab-btn" onclick="openTab('premium', this, 'bijkar')">Premium Plans</button>
+            <button class="tab-btn" onclick="openTab('python', this, 'bijkar')">Python Course</button>
+            <button class="tab-btn" onclick="openTab('admission', this, 'bijkar')">Admission Fee</button>
         </div>
-    </div>
 
-    <div id="premium" class="tab-content">
-        <div class="pricing-grid">
-            <div class="card premium">
-                <div class="card-header">
-                    <h3 class="card-title">Premium HTML</h3>
-                    <div class="card-price">₹429<span>/month</span></div>
-                </div>
-                <ul class="features">
-                    <li><strong>Syllabus:</strong> HTML Full Course</li>
-                    <li><strong>Videos:</strong> Normal + Upcoming</li>
-                    <li><strong>Features:</strong> 3 Projects</li>
-                    <li><strong>Exams:</strong> 2 (Theory + Practical)</li>
-                </ul>
-                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
-            </div>
-
-            <div class="card premium">
-                <div class="card-header">
-                    <h3 class="card-title">Premium Full Stack</h3>
-                    <div class="card-price">₹2399<span>/month</span></div>
-                </div>
-                <ul class="features">
-                    <li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li>
-                    <li><strong>Videos:</strong> Normal + Upcoming</li>
-                    <li><strong>Features:</strong> 38 Projects</li>
-                    <li><strong>Daily Tasks:</strong> 3 Homework, 8 Practice</li>
-                    <li><strong>Exams:</strong> 14 (Theory + Practical)</li>
-                    <li><strong>Support:</strong> Full Doubt & Question Solving</li>
-                </ul>
-                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
-            </div>
-
-            <div class="card personal premium">
-                <div class="card-header">
-                    <h3 class="card-title">Ultimate Personal</h3>
-                    <div class="card-price">₹3799<span>/month</span></div>
-                </div>
-                <ul class="features">
-                    <li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li>
-                    <li><strong>Videos:</strong> Normal + Upcoming</li>
-                    <li><strong>Advantage:</strong> Mere se sikh paoge</li>
-                    <li><strong>Features:</strong> 42 Projects</li>
-                    <li><strong>Daily Tasks:</strong> 8 Homework, 12 Practice</li>
-                    <li><strong>Exams:</strong> 21 (Theory + Practical)</li>
-                    <li><strong>Support:</strong> Full Doubt & Question Solving</li>
-                </ul>
-                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
-            </div>
-        </div>
-    </div>
-
-    <div id="python" class="tab-content">
-        <div class="pricing-grid">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Bronze Plan</h3>
-                    <div class="card-price">₹129<span>/month</span></div>
-                </div>
-                <ul class="features">
-                    <li><strong>Syllabus:</strong> Basic Python</li>
-                    <li><strong>Features:</strong> 1 Project per class</li>
-                </ul>
-                <div class="addons-box">
-                    <p>Optional Add-ons:</p>
-                    <ul>
-                        <li>Extra Project / Homework: ₹19 each</li>
-                        <li>Project Fee: ₹29</li>
-                        <li>Exam Theory Fee: ₹39</li>
-                        <li>Exam Practical Fee: ₹49</li>
+        <div id="biggest" class="tab-content bijkar-content" style="display: block;">
+            <div class="pricing-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Biggest Plan</h3>
+                        <div class="card-price">₹149<span>/month</span></div>
+                    </div>
+                    <ul class="features">
+                        <li><strong>Syllabus:</strong> HTML Only</li>
+                        <li><strong>Videos:</strong> Normal + Upcoming</li>
                     </ul>
+                    <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
                 </div>
-                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Standard Plan</h3>
+                        <div class="card-price">₹429<span>/month</span></div>
+                    </div>
+                    <ul class="features">
+                        <li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li>
+                        <li><strong>Videos:</strong> Normal + Upcoming</li>
+                        <li><strong>Features:</strong> 2 Projects</li>
+                    </ul>
+                    <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+                </div>
+                <div class="card personal">
+                    <div class="card-header">
+                        <h3 class="card-title">Personally Plan</h3>
+                        <div class="card-price">₹799<span>/month</span></div>
+                    </div>
+                    <ul class="features">
+                        <li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li>
+                        <li><strong>Videos:</strong> Normal + Upcoming</li>
+                        <li><strong>Features:</strong> 5 Projects</li>
+                    </ul>
+                    <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="premium" class="tab-content bijkar-content">
+            <div class="pricing-grid">
+                <div class="card premium">
+                    <div class="card-header">
+                        <h3 class="card-title">Premium HTML</h3>
+                        <div class="card-price">₹429<span>/month</span></div>
+                    </div>
+                    <ul class="features">
+                        <li><strong>Syllabus:</strong> HTML Full Course</li>
+                        <li><strong>Videos:</strong> Normal + Upcoming</li>
+                        <li><strong>Features:</strong> 3 Projects</li>
+                        <li><strong>Exams:</strong> 2 (Theory + Practical)</li>
+                    </ul>
+                    <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+                </div>
+                <div class="card premium">
+                    <div class="card-header">
+                        <h3 class="card-title">Premium Full Stack</h3>
+                        <div class="card-price">₹2399<span>/month</span></div>
+                    </div>
+                    <ul class="features">
+                        <li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li>
+                        <li><strong>Features:</strong> 38 Projects</li>
+                        <li><strong>Exams:</strong> 14 (Theory + Practical)</li>
+                    </ul>
+                    <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+                </div>
+                <div class="card personal premium">
+                    <div class="card-header">
+                        <h3 class="card-title">Ultimate Personal</h3>
+                        <div class="card-price">₹3799<span>/month</span></div>
+                    </div>
+                    <ul class="features">
+                        <li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li>
+                        <li><strong>Advantage:</strong> Mere se sikh paoge</li>
+                        <li><strong>Features:</strong> 42 Projects</li>
+                        <li><strong>Exams:</strong> 21 (Theory + Practical)</li>
+                    </ul>
+                    <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="python" class="tab-content bijkar-content">
+            <div class="pricing-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Bronze Plan</h3>
+                        <div class="card-price">₹129<span>/month</span></div>
+                    </div>
+                    <ul class="features">
+                        <li><strong>Syllabus:</strong> Basic Python</li>
+                        <li><strong>Features:</strong> 1 Project per class</li>
+                    </ul>
+                    <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Buy</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="admission" class="tab-content bijkar-content">
+            <div class="pricing-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Bugged Admission</h3>
+                        <div class="card-price">₹199<span>/one-time</span></div>
+                    </div>
+                    <ul class="features">
+                        <li><strong>Applicable for:</strong> Bugged Plans</li>
+                        <li><strong>Type:</strong> Registration fee</li>
+                    </ul>
+                    <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Pay</a>
+                </div>
+                <div class="card premium">
+                    <div class="card-header">
+                        <h3 class="card-title">Premium Admission</h3>
+                        <div class="card-price">₹499<span>/one-time</span></div>
+                    </div>
+                    <ul class="features">
+                        <li><strong>Applicable for:</strong> Premium Plans</li>
+                        <li><strong>Type:</strong> Registration fee</li>
+                    </ul>
+                    <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Pay</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="admission" class="tab-content">
-        <div class="pricing-grid">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Bugged Admission</h3>
-                    <div class="card-price">₹199<span>/one-time</span></div>
-                </div>
-                <ul class="features">
-                    <li><strong>Applicable for:</strong> Biggest / Bugged Plans</li>
-                    <li><strong>Type:</strong> One-time registration fee</li>
-                </ul>
-                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Pay</a>
-            </div>
 
-            <div class="card premium">
-                <div class="card-header">
-                    <h3 class="card-title">Premium Admission</h3>
-                    <div class="card-price">₹499<span>/one-time</span></div>
+    <div id="free-content-section" class="main-section" style="display: none;">
+        <h1>Free Content Creation</h1>
+        <p class="subtitle">Minecraft Gameplay - Choose your perfect server plan.</p>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('mc-bugged', this, 'mc')">Bugged Plans</button>
+            <button class="tab-btn" onclick="openTab('mc-premium', this, 'mc')">Premium Plans</button>
+        </div>
+
+        <div id="mc-bugged" class="tab-content mc-content" style="display: block;">
+            <div class="pricing-grid">
+                <div class="card minecraft">
+                    <div class="card-header"><h3 class="card-title">Grass Plan</h3><div class="card-price">₹40<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 4</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
                 </div>
-                <ul class="features">
-                    <li><strong>Applicable for:</strong> Premium Plans</li>
-                    <li><strong>Type:</strong> One-time registration fee</li>
-                </ul>
-                <a href="https://discord.gg/mSxRpFatc" target="_blank" class="btn">Go to Discord to Pay</a>
+                <div class="card minecraft">
+                    <div class="card-header"><h3 class="card-title">Stone Plan</h3><div class="card-price">₹70<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 7</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card minecraft">
+                    <div class="card-header"><h3 class="card-title">Iron Plan</h3><div class="card-price">₹100<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 14</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card minecraft">
+                    <div class="card-header"><h3 class="card-title">Snow Plan</h3><div class="card-price">₹200<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 21</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card minecraft">
+                    <div class="card-header"><h3 class="card-title">Glass Plan</h3><div class="card-price">₹350<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 38</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card minecraft">
+                    <div class="card-header"><h3 class="card-title">Diamond Plan</h3><div class="card-price">₹550<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 54</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card minecraft">
+                    <div class="card-header"><h3 class="card-title">Netherite Plan</h3><div class="card-price">₹730<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 80+</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="mc-premium" class="tab-content mc-content">
+            <div class="pricing-grid">
+                <div class="card premium">
+                    <div class="card-header"><h3 class="card-title">Grass Plan</h3><div class="card-price">₹90<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 6</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card premium">
+                    <div class="card-header"><h3 class="card-title">Stone Plan</h3><div class="card-price">₹170<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 14</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card premium">
+                    <div class="card-header"><h3 class="card-title">Iron Plan</h3><div class="card-price">₹270<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 32</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card premium">
+                    <div class="card-header"><h3 class="card-title">Snow Plan</h3><div class="card-price">₹390<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 51</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card premium">
+                    <div class="card-header"><h3 class="card-title">Glass Plan</h3><div class="card-price">₹810<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 86</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card premium">
+                    <div class="card-header"><h3 class="card-title">Diamond Plan</h3><div class="card-price">₹1300<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 150</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
+                <div class="card premium">
+                    <div class="card-header"><h3 class="card-title">Netherite Plan</h3><div class="card-price">₹1620<span>/month</span></div></div>
+                    <ul class="features"><li><strong>Player Limit:</strong> 150+</li><li><strong>Features:</strong> Free Server</li><li><strong>Playtime:</strong> Unlimited</li></ul>
+                    <a href="https://discord.gg/6Ra4cYaRP" target="_blank" class="btn">Buy Now</a>
+                </div>
             </div>
         </div>
     </div>
@@ -334,20 +471,49 @@
 </div>
 
 <script>
-    function openTab(tabName, element) {
-        // Hide all tab contents
-        let contents = document.getElementsByClassName("tab-content");
+    // Theme Toggle Function
+    function toggleTheme() {
+        document.body.classList.toggle("dark-theme");
+        let themeBtn = document.getElementById("theme-icon");
+        
+        if (document.body.classList.contains("dark-theme")) {
+            themeBtn.innerText = "☀️ Light Theme";
+        } else {
+            themeBtn.innerText = "🌙 Dark Theme";
+        }
+    }
+
+    // Function to switch between main sections (Navbar links)
+    function switchSection(sectionId, element) {
+        let sections = document.getElementsByClassName("main-section");
+        for (let i = 0; i < sections.length; i++) {
+            sections[i].style.display = "none";
+        }
+        
+        let navLinks = document.getElementsByClassName("nav-link");
+        for (let i = 0; i < navLinks.length; i++) {
+            // Keep the theme button styling independent
+            if(!navLinks[i].classList.contains("theme-btn")) {
+                navLinks[i].classList.remove("active");
+            }
+        }
+        
+        document.getElementById(sectionId).style.display = "block";
+        element.classList.add("active");
+    }
+
+    // Function to switch tabs inside sections
+    function openTab(tabName, element, type) {
+        let contents = document.getElementsByClassName(type + "-content");
         for (let i = 0; i < contents.length; i++) {
             contents[i].style.display = "none";
         }
         
-        // Remove 'active' class from all buttons
-        let buttons = document.getElementsByClassName("tab-btn");
+        let buttons = element.parentElement.getElementsByClassName("tab-btn");
         for (let i = 0; i < buttons.length; i++) {
             buttons[i].classList.remove("active");
         }
         
-        // Show the selected tab and add 'active' class to the clicked button
         document.getElementById(tabName).style.display = "block";
         element.classList.add("active");
     }
