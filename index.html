@@ -157,6 +157,7 @@
         .card.premium { border-top: 4px solid #f1c40f; background: var(--premium-bg); }
         .card.personal { border-top: 4px solid #e74c3c; }
         .card.minecraft { border-top: 4px solid #2ecc71; } 
+        .card.testing { border-top: 4px solid #9b59b6; } /* Purple for Testing */
 
         .card-header { margin-bottom: 20px; }
         .card-title {
@@ -309,6 +310,7 @@
             <button class="tab-btn" onclick="openTab('premium', this, 'bijkar')">Premium Plans</button>
             <button class="tab-btn" onclick="openTab('python', this, 'bijkar')">Python Course</button>
             <button class="tab-btn" onclick="openTab('admission', this, 'bijkar')">Admission Fee</button>
+            <button class="tab-btn" onclick="openTab('testing', this, 'bijkar')">Test Payment</button>
         </div>
 
         <div id="biggest" class="tab-content bijkar-content" style="display: block;">
@@ -376,6 +378,19 @@
                     <div class="card-header"><h3 class="card-title">Premium Admission</h3><div class="card-price">₹499<span>/one-time</span></div></div>
                     <ul class="features"><li><strong>Type:</strong> Registration fee for Premium Plans</li></ul>
                     <button onclick="openPaymentModal('Premium Admission Fee', 499, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="testing" class="tab-content bijkar-content">
+            <div class="pricing-grid">
+                <div class="card testing">
+                    <div class="card-header"><h3 class="card-title">Test Plan</h3><div class="card-price">₹1<span>/one-time</span></div></div>
+                    <ul class="features">
+                        <li><strong>Service:</strong> Testing Payment Gateway</li>
+                        <li><strong>Note:</strong> Safe to use to test if UPI works perfectly on your device!</li>
+                    </ul>
+                    <button onclick="openPaymentModal('Test Plan', 1, 'https://discord.gg/mSxRpFatc')" class="btn">Test Pay Now</button>
                 </div>
             </div>
         </div>
