@@ -157,7 +157,6 @@
         .card.premium { border-top: 4px solid #f1c40f; background: var(--premium-bg); }
         .card.personal { border-top: 4px solid #e74c3c; }
         .card.minecraft { border-top: 4px solid #2ecc71; } 
-        .card.testing { border-top: 4px solid #9b59b6; } /* Purple for Testing */
 
         .card-header { margin-bottom: 20px; }
         .card-title {
@@ -257,6 +256,8 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             position: relative;
             animation: scaleIn 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         @keyframes scaleIn {
             from { transform: scale(0.9); opacity: 0; }
@@ -271,13 +272,66 @@
             transition: color 0.3s;
         }
         .close-btn:hover { color: #e74c3c; }
-        .modal-box h2 { color: var(--card-title); margin-top: 0; }
-        .modal-box p { margin-bottom: 20px; line-height: 1.5; }
+        .modal-box h2 { color: var(--card-title); margin-top: 0; margin-bottom: 10px; }
+        
+        /* Payment Toggle Buttons inside Modal */
+        .pay-toggle-container {
+            display: flex;
+            background: var(--tab-bg);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 5px;
+        }
+        .pay-toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-weight: bold;
+            color: var(--subtitle-color);
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .pay-toggle-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .pay-method-content {
+            display: none;
+            text-align: left;
+            background: var(--tab-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        .pay-method-content.active {
+            display: block;
+        }
+
         .pay-upi-btn {
             background-color: #27ae60;
             margin-bottom: 12px;
         }
         .pay-upi-btn:hover { background-color: #219653; }
+        
+        .playstore-icon {
+            color: #0F9D58;
+            font-weight: bold;
+        }
+
+        /* Editing Course Section Headers */
+        .software-title {
+            text-align: center; 
+            color: var(--card-title); 
+            margin: 40px 0 15px 0; 
+            font-size: 1.8em;
+            border-bottom: 2px solid #3498db;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -285,7 +339,6 @@
             h1 { font-size: 2em; }
             .top-nav { gap: 10px; justify-content: center; }
             .theme-btn { margin-left: 0; width: 100%; text-align: center; }
-            .nav-link { font-size: 0.9em; padding: 6px 10px; }
             .pricing-grid { grid-template-columns: 1fr; gap: 20px; }
             .tab-btn { padding: 10px 15px; font-size: 0.95em; flex: 1 1 auto; }
         }
@@ -303,53 +356,29 @@
 
     <div id="bijkar-section" class="main-section" style="display: block;">
         <h1>Bijkar Program YT Course</h1>
-        <p class="subtitle">Choose your coding path and get started today.</p>
+        <p class="subtitle">Choose your coding or editing path and get started today.</p>
 
         <div class="tabs">
             <button class="tab-btn active" onclick="openTab('biggest', this, 'bijkar')">Biggest Plans</button>
             <button class="tab-btn" onclick="openTab('premium', this, 'bijkar')">Premium Plans</button>
             <button class="tab-btn" onclick="openTab('python', this, 'bijkar')">Python Course</button>
+            <button class="tab-btn" onclick="openTab('editing', this, 'bijkar')">Editing Course</button>
             <button class="tab-btn" onclick="openTab('admission', this, 'bijkar')">Admission Fee</button>
-            <button class="tab-btn" onclick="openTab('testing', this, 'bijkar')">Test Payment</button>
         </div>
 
         <div id="biggest" class="tab-content bijkar-content" style="display: block;">
             <div class="pricing-grid">
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Biggest Plan</h3><div class="card-price">₹149<span>/month</span></div></div>
-                    <ul class="features"><li><strong>Syllabus:</strong> HTML Only</li><li><strong>Videos:</strong> Normal + Upcoming</li></ul>
-                    <button onclick="openPaymentModal('Biggest Plan', 149, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
-                </div>
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Standard Plan</h3><div class="card-price">₹429<span>/month</span></div></div>
-                    <ul class="features"><li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li><li><strong>Videos:</strong> Normal + Upcoming</li><li><strong>Features:</strong> 2 Projects</li></ul>
-                    <button onclick="openPaymentModal('Standard Plan', 429, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
-                </div>
-                <div class="card personal">
-                    <div class="card-header"><h3 class="card-title">Personally Plan</h3><div class="card-price">₹799<span>/month</span></div></div>
-                    <ul class="features"><li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li><li><strong>Videos:</strong> Normal + Upcoming</li><li><strong>Features:</strong> 5 Projects</li></ul>
-                    <button onclick="openPaymentModal('Personally Plan', 799, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
-                </div>
+                <div class="card"><div class="card-header"><h3 class="card-title">Biggest Plan</h3><div class="card-price">₹149<span>/month</span></div></div><ul class="features"><li><strong>Syllabus:</strong> HTML Only</li><li><strong>Videos:</strong> Normal + Upcoming</li></ul><button onclick="openPaymentModal('Biggest Plan', 149, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card"><div class="card-header"><h3 class="card-title">Standard Plan</h3><div class="card-price">₹429<span>/month</span></div></div><ul class="features"><li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li><li><strong>Videos:</strong> Normal + Upcoming</li><li><strong>Features:</strong> 2 Projects</li></ul><button onclick="openPaymentModal('Standard Plan', 429, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card personal"><div class="card-header"><h3 class="card-title">Personally Plan</h3><div class="card-price">₹799<span>/month</span></div></div><ul class="features"><li><strong>Syllabus:</strong> HTML, CSS, JavaScript</li><li><strong>Videos:</strong> Normal + Upcoming</li><li><strong>Features:</strong> 5 Projects</li></ul><button onclick="openPaymentModal('Personally Plan', 799, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
             </div>
         </div>
 
         <div id="premium" class="tab-content bijkar-content">
             <div class="pricing-grid">
-                <div class="card premium">
-                    <div class="card-header"><h3 class="card-title">Premium HTML</h3><div class="card-price">₹429<span>/month</span></div></div>
-                    <ul class="features"><li><strong>Syllabus:</strong> HTML Full Course</li><li><strong>Features:</strong> 3 Projects</li><li><strong>Exams:</strong> 2 (Theory + Practical)</li></ul>
-                    <button onclick="openPaymentModal('Premium HTML Plan', 429, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
-                </div>
-                <div class="card premium">
-                    <div class="card-header"><h3 class="card-title">Premium Full Stack</h3><div class="card-price">₹2399<span>/month</span></div></div>
-                    <ul class="features"><li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li><li><strong>Features:</strong> 38 Projects</li><li><strong>Exams:</strong> 14 (Theory + Practical)</li></ul>
-                    <button onclick="openPaymentModal('Premium Full Stack', 2399, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
-                </div>
-                <div class="card personal premium">
-                    <div class="card-header"><h3 class="card-title">Ultimate Personal</h3><div class="card-price">₹3799<span>/month</span></div></div>
-                    <ul class="features"><li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li><li><strong>Features:</strong> 42 Projects</li><li><strong>Exams:</strong> 21 (Theory + Practical)</li></ul>
-                    <button onclick="openPaymentModal('Ultimate Personal Plan', 3799, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
-                </div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Premium HTML</h3><div class="card-price">₹429<span>/month</span></div></div><ul class="features"><li><strong>Syllabus:</strong> HTML Full Course</li><li><strong>Features:</strong> 3 Projects</li><li><strong>Exams:</strong> 2 (Theory + Practical)</li></ul><button onclick="openPaymentModal('Premium HTML Plan', 429, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Premium Full Stack</h3><div class="card-price">₹2399<span>/month</span></div></div><ul class="features"><li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li><li><strong>Features:</strong> 38 Projects</li><li><strong>Exams:</strong> 14 (Theory + Practical)</li></ul><button onclick="openPaymentModal('Premium Full Stack', 2399, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card personal premium"><div class="card-header"><h3 class="card-title">Ultimate Personal</h3><div class="card-price">₹3799<span>/month</span></div></div><ul class="features"><li><strong>Syllabus:</strong> HTML, CSS, JS Full Course</li><li><strong>Advantage:</strong> Mere se sikh paoge</li><li><strong>Features:</strong> 42 Projects</li><li><strong>Exams:</strong> 21 (Theory + Practical)</li></ul><button onclick="openPaymentModal('Ultimate Personal Plan', 3799, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
             </div>
         </div>
 
@@ -358,40 +387,47 @@
                 <div class="card">
                     <div class="card-header"><h3 class="card-title">Bronze Plan (Bugged)</h3><div class="card-price">₹129<span>/month</span></div></div>
                     <ul class="features"><li><strong>Syllabus:</strong> Basic Python</li><li><strong>Features:</strong> 1 Project/class</li></ul>
-                    <div class="addons-box">
-                        <p>Extra Fees & Advantages:</p>
-                        <ul><li><strong>Project Fee:</strong> ₹29</li><li><strong>Exam Theory Fee:</strong> ₹39</li><li><strong>Exam Practical Fee:</strong> ₹49</li><li><strong>Advantage:</strong> Extra ₹19 mein additional Project ya Homework.</li></ul>
-                    </div>
+                    <div class="addons-box"><p>Extra Fees & Advantages:</p><ul><li><strong>Project Fee:</strong> ₹29</li><li><strong>Exam Thr Fee:</strong> ₹39</li><li><strong>Exam Pr Fee:</strong> ₹49</li><li><strong>Advantage:</strong> Student chahe to ₹19 deke project, ₹19 deke homework le sakta hai.</li></ul></div>
                     <button onclick="openPaymentModal('Bronze Python Plan', 129, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
                 </div>
             </div>
         </div>
 
-        <div id="admission" class="tab-content bijkar-content">
-            <div class="pricing-grid">
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Bugged Admission</h3><div class="card-price">₹199<span>/one-time</span></div></div>
-                    <ul class="features"><li><strong>Type:</strong> Registration fee for Bugged Plans</li></ul>
-                    <button onclick="openPaymentModal('Bugged Admission Fee', 199, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
-                </div>
-                <div class="card premium">
-                    <div class="card-header"><h3 class="card-title">Premium Admission</h3><div class="card-price">₹499<span>/one-time</span></div></div>
-                    <ul class="features"><li><strong>Type:</strong> Registration fee for Premium Plans</li></ul>
-                    <button onclick="openPaymentModal('Premium Admission Fee', 499, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button>
-                </div>
+        <div id="editing" class="tab-content bijkar-content" style="text-align: center;">
+            
+            <h2 class="software-title">🎬 KineMaster</h2>
+            <div class="pricing-grid" style="text-align: left;">
+                <div class="card"><div class="card-header"><h3 class="card-title">Basic</h3><div class="card-price">₹239<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Basic Editing</li><li><strong>Features:</strong> 2 Projects</li><li><strong>Exams:</strong> 1 Exam</li></ul><button onclick="openPaymentModal('KineMaster Basic', 239, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card"><div class="card-header"><h3 class="card-title">Medium</h3><div class="card-price">₹749<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Medium Editing</li><li><strong>Features:</strong> 12 Projects</li><li><strong>Exams:</strong> 3 Exams</li></ul><button onclick="openPaymentModal('KineMaster Medium', 749, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Full Course</h3><div class="card-price">₹1799<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Full KineMaster</li><li><strong>Features:</strong> 22 Projects</li><li><strong>Exams:</strong> 6 Exams</li></ul><button onclick="openPaymentModal('KineMaster Full', 1799, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+            </div>
+
+            <h2 class="software-title">✂️ CapCut</h2>
+            <div class="pricing-grid" style="text-align: left;">
+                <div class="card"><div class="card-header"><h3 class="card-title">Basic</h3><div class="card-price">₹119<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Basics Editing</li><li><strong>Features:</strong> 3 Projects</li><li><strong>Exams:</strong> 1 Exam</li></ul><button onclick="openPaymentModal('CapCut Basic', 119, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card"><div class="card-header"><h3 class="card-title">Medium</h3><div class="card-price">₹519<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Mid Editing</li><li><strong>Features:</strong> 7 Projects</li><li><strong>Exams:</strong> 2 Exams</li></ul><button onclick="openPaymentModal('CapCut Medium', 519, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Full Course</h3><div class="card-price">₹1999<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Full CapCut</li><li><strong>Features:</strong> 25 Projects</li><li><strong>Exams:</strong> 4 Exams</li></ul><button onclick="openPaymentModal('CapCut Full', 1999, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+            </div>
+
+            <h2 class="software-title">✨ Alight Motion</h2>
+            <div class="pricing-grid" style="text-align: left;">
+                <div class="card"><div class="card-header"><h3 class="card-title">Basic</h3><div class="card-price">₹399<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Basics Editing</li><li><strong>Features:</strong> 8 Projects</li><li><strong>Exams:</strong> 2 Exams</li></ul><button onclick="openPaymentModal('Alight Motion Basic', 399, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card"><div class="card-header"><h3 class="card-title">Medium</h3><div class="card-price">₹1199<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Medium Editing</li><li><strong>Features:</strong> 15 Projects</li><li><strong>Exams:</strong> 3 Exams</li></ul><button onclick="openPaymentModal('Alight Motion Medium', 1199, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Full Course</h3><div class="card-price">₹2199<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Full Alight Motion</li><li><strong>Features:</strong> 20 Projects</li><li><strong>Exams:</strong> 4 Exams</li></ul><button onclick="openPaymentModal('Alight Motion Full', 2199, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+            </div>
+
+            <h2 class="software-title">🎞️ YouCut</h2>
+            <div class="pricing-grid" style="text-align: left;">
+                <div class="card"><div class="card-header"><h3 class="card-title">Basic</h3><div class="card-price">₹49<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Basics Editing</li><li><strong>Features:</strong> 1 Project</li><li><strong>Exams:</strong> 1 Exam</li></ul><button onclick="openPaymentModal('YouCut Basic', 49, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card"><div class="card-header"><h3 class="card-title">Medium</h3><div class="card-price">₹119<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Medium Editing</li><li><strong>Features:</strong> 3 Projects</li><li><strong>Exams:</strong> 1 Exam</li></ul><button onclick="openPaymentModal('YouCut Medium', 119, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Full Course</h3><div class="card-price">₹199<span>/course</span></div></div><ul class="features"><li><strong>Syllabus:</strong> Full YouCut</li><li><strong>Features:</strong> 5 Projects</li><li><strong>Exams:</strong> 2 Exams</li></ul><button onclick="openPaymentModal('YouCut Full', 199, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
             </div>
         </div>
 
-        <div id="testing" class="tab-content bijkar-content">
+        <div id="admission" class="tab-content bijkar-content">
             <div class="pricing-grid">
-                <div class="card testing">
-                    <div class="card-header"><h3 class="card-title">Test Plan</h3><div class="card-price">₹1<span>/one-time</span></div></div>
-                    <ul class="features">
-                        <li><strong>Service:</strong> Testing Payment Gateway</li>
-                        <li><strong>Note:</strong> Safe to use to test if UPI works perfectly on your device!</li>
-                    </ul>
-                    <button onclick="openPaymentModal('Test Plan', 1, 'https://discord.gg/mSxRpFatc')" class="btn">Test Pay Now</button>
-                </div>
+                <div class="card"><div class="card-header"><h3 class="card-title">Bugged Admission</h3><div class="card-price">₹199<span>/one-time</span></div></div><ul class="features"><li><strong>Type:</strong> Registration fee for Bugged Plans</li></ul><button onclick="openPaymentModal('Bugged Admission Fee', 199, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Premium Admission</h3><div class="card-price">₹499<span>/one-time</span></div></div><ul class="features"><li><strong>Type:</strong> Registration fee for Premium Plans</li></ul><button onclick="openPaymentModal('Premium Admission Fee', 499, 'https://discord.gg/mSxRpFatc')" class="btn">Buy Now</button></div>
             </div>
         </div>
     </div>
@@ -408,25 +444,25 @@
 
         <div id="mc-bugged" class="tab-content mc-content" style="display: block;">
             <div class="pricing-grid">
-                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Grass Plan</h3><div class="card-price">₹40<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Grass (Bugged)', 40, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Stone Plan</h3><div class="card-price">₹70<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Stone (Bugged)', 70, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Iron Plan</h3><div class="card-price">₹100<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Iron (Bugged)', 100, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Snow Plan</h3><div class="card-price">₹200<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Snow (Bugged)', 200, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Glass Plan</h3><div class="card-price">₹350<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Glass (Bugged)', 350, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Diamond Plan</h3><div class="card-price">₹550<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Diamond (Bugged)', 550, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Netherite Plan</h3><div class="card-price">₹730<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Netherite (Bugged)', 730, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Grass Plan</h3><div class="card-price">₹40<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 4 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Grass (Bugged)', 40, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Stone Plan</h3><div class="card-price">₹70<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 7 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Stone (Bugged)', 70, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Iron Plan</h3><div class="card-price">₹100<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 14 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Iron (Bugged)', 100, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Snow Plan</h3><div class="card-price">₹200<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 21 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Snow (Bugged)', 200, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Glass Plan</h3><div class="card-price">₹350<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 38 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Glass (Bugged)', 350, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Diamond Plan</h3><div class="card-price">₹550<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 54 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Diamond (Bugged)', 550, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card minecraft"><div class="card-header"><h3 class="card-title">Netherite Plan</h3><div class="card-price">₹730<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 80+ Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Netherite (Bugged)', 730, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
             </div>
         </div>
 
         <div id="mc-premium" class="tab-content mc-content">
             <div class="pricing-grid">
-                <div class="card premium"><div class="card-header"><h3 class="card-title">Grass Plan</h3><div class="card-price">₹90<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Grass (Premium)', 90, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card premium"><div class="card-header"><h3 class="card-title">Stone Plan</h3><div class="card-price">₹170<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Stone (Premium)', 170, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card premium"><div class="card-header"><h3 class="card-title">Iron Plan</h3><div class="card-price">₹270<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Iron (Premium)', 270, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card premium"><div class="card-header"><h3 class="card-title">Snow Plan</h3><div class="card-price">₹390<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Snow (Premium)', 390, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card premium"><div class="card-header"><h3 class="card-title">Glass Plan</h3><div class="card-price">₹810<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Glass (Premium)', 810, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card premium"><div class="card-header"><h3 class="card-title">Diamond Plan</h3><div class="card-price">₹1300<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Diamond (Premium)', 1300, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
-                <div class="card premium"><div class="card-header"><h3 class="card-title">Netherite Plan</h3><div class="card-price">₹1620<span>/mo</span></div></div><button onclick="openPaymentModal('Minecraft Netherite (Premium)', 1620, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Grass Plan</h3><div class="card-price">₹90<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 6 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Grass (Premium)', 90, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Stone Plan</h3><div class="card-price">₹170<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 14 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Stone (Premium)', 170, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Iron Plan</h3><div class="card-price">₹270<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 32 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Iron (Premium)', 270, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Snow Plan</h3><div class="card-price">₹390<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 51 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Snow (Premium)', 390, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Glass Plan</h3><div class="card-price">₹810<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 86 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Glass (Premium)', 810, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Diamond Plan</h3><div class="card-price">₹1300<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 150 Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Diamond (Premium)', 1300, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
+                <div class="card premium"><div class="card-header"><h3 class="card-title">Netherite Plan</h3><div class="card-price">₹1620<span>/mo</span></div></div><ul class="features"><li><strong>Limit:</strong> 150+ Players</li><li>Free Server, Unlimited Playtime</li></ul><button onclick="openPaymentModal('Minecraft Netherite (Premium)', 1620, 'https://discord.gg/6Ra4cYaRP')" class="btn">Buy Now</button></div>
             </div>
         </div>
     </div>
@@ -436,23 +472,39 @@
 <div id="payment-modal" class="modal-overlay">
     <div class="modal-box">
         <span class="close-btn" onclick="closePaymentModal()">&times;</span>
-        <h2>Complete Your Payment</h2>
-        <p style="font-size: 1.1em;">Selected Plan: <br><strong id="modal-plan-name" style="color: #3498db;"></strong></p>
-        <p>Amount to Pay: <br><strong style="color: #27ae60; font-size: 2em;">₹<span id="modal-amount"></span></strong></p>
+        <h2>Complete Payment</h2>
+        <p style="font-size: 1.1em; margin-bottom: 5px;"><strong id="modal-plan-name" style="color: #3498db;"></strong></p>
+        <p style="margin-top: 0;">Amount: <strong style="color: #27ae60; font-size: 1.8em;">₹<span id="modal-amount"></span></strong></p>
         
-        <div style="background: var(--tab-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; text-align: left;">
-            <p style="margin: 0 0 10px 0; font-weight: bold; color: #e67e22;">Steps for access:</p>
-            <ol style="margin: 0; padding-left: 20px;">
-                <li>Click the green button to pay via UPI.</li>
-                <li>Take a <strong>Screenshot</strong> of the successful payment.</li>
-                <li>Join our Discord and send the screenshot to get access!</li>
-            </ol>
-            <p style="margin-top: 10px; font-size: 0.85em; color: var(--subtitle-color);">Note: Agar button se app open na ho, toh manually UPI id <strong>9641080857@fam</strong> par pay karein.</p>
+        <div class="pay-toggle-container">
+            <button id="tab-upi" class="pay-toggle-btn active" onclick="switchPayMethod('upi')">UPI App</button>
+            <button id="tab-redeem" class="pay-toggle-btn" onclick="switchPayMethod('redeem')">Play Store Redeem</button>
         </div>
 
-        <a id="pay-btn" href="#" target="_blank" class="btn pay-upi-btn">Pay ₹<span id="btn-amount"></span> via UPI App</a>
+        <div id="content-upi" class="pay-method-content active">
+            <p style="margin: 0 0 10px 0; font-weight: bold; color: #27ae60;">Via Google Pay, PhonePe, FamPay etc.</p>
+            <ol style="margin: 0; padding-left: 20px;">
+                <li>Click the green button below to open your UPI App.</li>
+                <li>Complete the payment of <strong>₹<span id="instruction-amount-upi"></span></strong>.</li>
+                <li>Take a <strong>Screenshot</strong> and send it on our Discord!</li>
+            </ol>
+            <p style="margin-top: 10px; font-size: 0.85em; color: var(--subtitle-color);">Manual UPI ID: <strong>9641080857@fam</strong></p>
+            <br>
+            <a id="pay-btn" href="#" target="_blank" class="btn pay-upi-btn">Pay ₹<span id="btn-amount"></span> via UPI App</a>
+        </div>
+
+        <div id="content-redeem" class="pay-method-content">
+            <p style="margin: 0 0 10px 0; font-weight: bold;" class="playstore-icon">Via Google Play Store Redeem Code</p>
+            <ol style="margin: 0; padding-left: 20px;">
+                <li>Open Paytm, PhonePe, or Amazon Pay.</li>
+                <li>Buy a Google Play Gift Card of exactly <strong>₹<span id="instruction-amount-redeem"></span></strong>.</li>
+                <li>Copy the <strong>16-digit Redeem Code</strong>.</li>
+                <li>Join our Discord and <strong>DM us the Code</strong> to get instant access!</li>
+            </ol>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #e74c3c;">Note: Website directly cannot scan codes. You must send it on Discord.</p>
+        </div>
         
-        <a id="discord-btn" href="#" target="_blank" class="btn" style="background-color: #5865F2;">Join Discord to Send Screenshot</a>
+        <a id="discord-btn" href="#" target="_blank" class="btn" style="background-color: #5865F2;">Join Discord to Send Proof</a>
     </div>
 </div>
 
@@ -495,8 +547,9 @@
         document.getElementById('modal-plan-name').innerText = planName;
         document.getElementById('modal-amount').innerText = amount;
         document.getElementById('btn-amount').innerText = amount;
+        document.getElementById('instruction-amount-upi').innerText = amount;
+        document.getElementById('instruction-amount-redeem').innerText = amount;
         
-        // Setup UPI Intent URL
         let upiId = "9641080857@fam";
         let payeeName = "Course Payment";
         let transactionNote = "Payment for " + planName;
@@ -505,12 +558,31 @@
         document.getElementById('pay-btn').href = upiLink;
         document.getElementById('discord-btn').href = discordLink;
         
-        // Show Modal
+        // Reset to UPI view by default when opening
+        switchPayMethod('upi');
+        
         document.getElementById('payment-modal').style.display = 'flex';
     }
 
     function closePaymentModal() {
         document.getElementById('payment-modal').style.display = 'none';
+    }
+
+    // Switch Payment Method inside Modal
+    function switchPayMethod(method) {
+        document.getElementById('tab-upi').classList.remove('active');
+        document.getElementById('tab-redeem').classList.remove('active');
+        document.getElementById('content-upi').classList.remove('active');
+        document.getElementById('content-redeem').classList.remove('active');
+        
+        document.getElementById('tab-' + method).classList.add('active');
+        document.getElementById('content-' + method).classList.add('active');
+        
+        if(method === 'redeem') {
+            document.getElementById('pay-btn').style.display = 'none';
+        } else {
+            document.getElementById('pay-btn').style.display = 'block';
+        }
     }
 </script>
 
