@@ -1,7 +1,14 @@
+/* body ka style */ 
+body {
+  margin: 0;
+  padding: 0;
+}
 /* text editor style */ 
 #editor {
-  width: 250px;
-  height: 150px;
+  width: 240px;
+  height: 140px;
+  margin-left: 5px;
+  margin-top: 5px;
 }
 
 /* run button style */ 
@@ -10,12 +17,15 @@
   width: 60px;
   height: 40px;
   font-size: 15px;
+  margin-left: 5px;
 }
 
-/* outputbox stylr */ 
+/* outputbox style */ 
 
 #output-box {
-  width: 250px;
+  width: 240px;
   height: 100px;
   border: 1px solid black;
+  margin-left: 5px;
+  margin-top: 5px;
 }
