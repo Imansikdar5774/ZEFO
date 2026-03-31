@@ -1,65 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Unavailable</title>
-    <style>
-        body { background-color: #0a0a0a; color: #ffffff; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .error-container { text-align: center; border: 2px solid #ff3333; background-color: rgba(255, 51, 51, 0.05); padding: 40px; border-radius: 10px; box-shadow: 0 0 30px rgba(255, 51, 51, 0.3); max-width: 90%; width: 600px; animation: glitch 1.5s infinite; }
-        h1 { color: #ff3333; font-size: 2.5em; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 10px #ff3333; }
-        .subtitle { font-size: 1.2em; color: #cccccc; margin-bottom: 30px; }
-        
-        /* Box ekdum khali rahega HTML mein */
-        #live-console { background-color: #000000; border: 1px solid #333333; border-left: 4px solid #ff3333; padding: 15px; text-align: left; border-radius: 5px; font-size: 0.95em; line-height: 1.6; min-height: 100px; }
-        
-        .err-text { color: #ff5555; font-weight: bold; }
-        @keyframes glitch { 0% { box-shadow: 0 0 30px rgba(255, 51, 51, 0.3); } 50% { box-shadow: 0 0 40px rgba(255, 51, 51, 0.6); } 100% { box-shadow: 0 0 30px rgba(255, 51, 51, 0.3); } }
-    </style>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>this is a editor</title>
 </head>
+
 <body>
-
-    <div class="error-container">
-        <h1>System Offline</h1>
-        <p class="subtitle">The website has been shutdown.</p>
-
-        <div id="live-console">
-            <span style="color: #55ff55;">> Initializing system...</span><br>
-        </div>
-    </div>
-
-    <script>
-        // 1. HTML ke khali box ko pakadna
-        const consoleBox = document.getElementById('live-console');
-
-        // 2. Browser ke kisi bhi Asli Error ko pakadne ka jaal (window.onerror)
-        window.onerror = function(errorMessage) {
-            
-            // DOM Creation: Naya paragraph element banaya
-            let errorLine = document.createElement('div');
-            errorLine.className = 'err-text';
-            
-            // Real error message ko usme daal diya
-            errorLine.innerHTML = "[FATAL ERROR Caught]: " + errorMessage;
-            
-            // Naye element ko screen (website) par chipka diya
-            consoleBox.appendChild(errorLine);
-            
-            let haltLine = document.createElement('div');
-            haltLine.innerHTML = "> _ System Halted. The website has been shutdown.";
-            consoleBox.appendChild(haltLine);
-
-            // Isko 'true' karne se error F12 console mein nahi jata, sirf website par rehta hai
-            return true; 
-        };
-
-        // 3. Jaan-boojh kar 1.5 second baad ek ASLI JavaScript error paida karna
-        setTimeout(() => {
-            // Hum ek aisi cheez chala rahe hain jo exist hi nahi karti! 
-            // Isse asli 'ReferenceError' aayega jo upar wala window.onerror pakad lega.
-            triggerShutdownProtocol(); 
-        }, 1500);
-    </script>
-
+  <!--normal text editor -->
+  <textarea id="editor"></textarea> <br>
+  <!-- run button -->
+  <button id="runBtn">RUN</button><br><br>
+  <!-- output box-->
+  <div id="output-box">
+    
+  </div>
 </body>
+
 </html>
