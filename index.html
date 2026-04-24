@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DearScript Official IDE - 0.0.12 Beta</title>
+    <title>DearScript Official IDE - 0.0.13 Beta</title>
     <style>
         * { 
             margin: 0; 
@@ -20,8 +20,10 @@
         .ace_editor { color: #FFFFFF !important; }
         .ace_keyword.ace_bik { color: #C805F5 !important; font-weight: bold !important; }
         .ace_keyword.ace_mi { color: #CFAD03 !important; font-weight: bold !important; }
+        .ace_keyword.ace_ifelse { color: #CFAD03 !important; font-weight: bold !important; } /* Gold for if/else */
+        .ace_constant.ace_boolean { color: #F67500 !important; font-weight: bold !important; } /* Orange for true/false */
         .ace_keyword.ace_detytype { color: #29C254 !important; font-weight: bold !important; }
-        .ace_keyword.ace_reserved { color: #5980F0 !important; font-weight: bold !important; }
+        .ace_keyword.ace_reserved { color: #5980F0 !important; font-weight: bold !important; } /* Blue for reserved */
         .ace_string { color: #008E1D !important; }
         .ace_constant.ace_numeric { color: #2BB5D6 !important; }
         .ace_comment { color: #323D55 !important; font-style: italic !important; }
@@ -130,6 +132,8 @@
         }
         .code-box span.p { color: #C805F5; font-weight: bold; }
         .code-box span.mi-kw { color: #CFAD03; font-weight: bold; }
+        .code-box span.if-kw { color: #CFAD03; font-weight: bold; }
+        .code-box span.bool-kw { color: #F67500; font-weight: bold; }
         .code-box span.type-kw { color: #29C254; font-weight: bold; }
         .code-box span.s { color: #008E1D; }
         .docs-error { 
@@ -173,7 +177,7 @@
 
     <div id="cli-modal">
         <div class="cli-header">
-            <span style="color:#C805F5; font-weight:bold;">DearScript OS Terminal v0.0.12</span>
+            <span style="color:#C805F5; font-weight:bold;">DearScript OS Terminal v0.0.13</span>
             <button onclick="document.getElementById('cli-modal').style.display='none'" style="background:#ff5555; color:white; border:none; padding:5px 10px; cursor:pointer; font-weight:bold;">EXIT</button>
         </div>
         <div id="cli-output">Welcome to DearScript OS. File system initialized.<br>Type 'ls' to see files. Type 'ds filename.ds' to run.<br>New! Compile to JS using 'ds filename.ds convert js'</div>
@@ -218,31 +222,44 @@
         </div>
         
         <div class="docs-section">
-            <h3 class="docs-h3">4. Variables & Arrays (mi)</h3>
-            <p>Use the <strong style="color:#CFAD03;">mi</strong> keyword to create variables. <strong>A semicolon (;) at the end is strictly required!</strong> You can perform math directly inside variables and store Arrays (Lists).</p>
+            <h3 class="docs-h3">4. Variables, Booleans & Arrays (mi)</h3>
+            <p>Use the <strong style="color:#CFAD03;">mi</strong> keyword to create variables. <strong>A semicolon (;) at the end is strictly required!</strong> You can perform math directly inside variables, store Arrays (Lists), and use <strong style="color:#F67500">true / false</strong> logic.</p>
             <div class="code-box">
                 <span class="mi-kw">mi</span> x = 90;<br>
                 <span class="mi-kw">mi</span> y = 80;<br>
-                <span class="mi-kw">mi</span> z = x + y;<br><br>
-                <span style="color: #323D55; font-style: italic;">// Storing an Array</span><br>
+                <span class="mi-kw">mi</span> isReady = <span class="bool-kw">true</span>;<br>
                 <span class="mi-kw">mi</span> arr = [1, 2.5, <span class="s">"hello"</span>, 4];<br>
                 <span class="p">bik</span> (arr)
             </div>
         </div>
+
+        <div class="docs-section">
+            <h3 class="docs-h3">5. Conditions (if / else)</h3>
+            <p>You can execute code conditionally using <strong style="color:#CFAD03">if / else:</strong> based entirely on Python-like indentation.</p>
+            <div class="code-box">
+                <span class="mi-kw">mi</span> x = 7;<br>
+                <span class="mi-kw">mi</span> y = 8;<br><br>
+                <span class="if-kw">if</span> x > y:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="p">bik</span> <span class="s">"hello"</span><br>
+                <span class="if-kw">else:</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="p">bik</span> <span class="s">"not miss"</span>
+            </div>
+        </div>
         
         <div class="docs-section">
-            <h3 class="docs-h3">5. Data Types</h3>
+            <h3 class="docs-h3">6. Data Types</h3>
             <p>DearScript supports multiple data types effortlessly:</p>
             <ul>
                 <li><strong>str:</strong> Text inside quotes, e.g., <code>"Hello"</code></li>
                 <li><strong>int:</strong> Whole numbers, e.g., <code>90</code></li>
                 <li><strong>float:</strong> Decimal numbers, e.g., <code>99.5</code></li>
                 <li><strong>array:</strong> Lists of mixed data, e.g., <code>[1, "hello", 3.5]</code></li>
+                <li><strong>boolean:</strong> Logical states, e.g., <code>true</code> or <code>false</code></li>
             </ul>
         </div>
         
         <div class="docs-section">
-            <h3 class="docs-h3">6. Data Type Checkers</h3>
+            <h3 class="docs-h3">7. Data Type Checkers</h3>
             <p>You can check the type of any variable using <code>dety()</code> or <code>type()</code> directly inside the bik command.</p>
             <div class="code-box">
                 <span class="mi-kw">mi</span> x = 90;<br>
@@ -252,7 +269,7 @@
         </div>
         
         <div class="docs-section">
-            <h3 class="docs-h3">7. Terminal & File System</h3>
+            <h3 class="docs-h3">8. Terminal & File System</h3>
             <p>DearScript comes with its own Virtual OS. Click the 3-dot menu -> Save File. Then open Terminal to manage your files!</p>
             <ul>
                 <li><code>ls</code> - View saved files in storage</li>
@@ -262,8 +279,8 @@
         </div>
 
         <div class="docs-section">
-            <h3 class="docs-h3">8. Compiler (Convert to JS)</h3>
-            <p><strong>NEW!</strong> Convert your DearScript files into native JavaScript code and download them automatically.</p>
+            <h3 class="docs-h3">9. Compiler (Convert to JS)</h3>
+            <p>Convert your DearScript files into native JavaScript code and download them automatically.</p>
             <ul>
                 <li><code>ds filename.ds convert js</code> - Converts <code>bik</code> to <code>console.log</code>.</li>
                 <li><code>ds filename.ds convert js dom</code> - Converts <code>bik</code> to <code>document.write</code>.</li>
@@ -281,6 +298,15 @@
         </div>
 
         <div class="docs-section">
+            <span class="history-version">0.0.13 beta (CONDITIONS & BOOLEANS UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Logic & Conditions:</strong> Introduced <code>if</code> and <code>else:</code> condition blocks with Python-style indentation tracking.</li>
+                <li><strong>Booleans:</strong> Native support for <code>true</code> and <code>false</code> data types added to variables and conditions.</li>
+                <li><strong>Expanded Reserved Keywords:</strong> Blocked variable names for <code>intezar</code>, <code>str</code>, <code>floot</code>, <code>Boolean</code>, <code>bool</code> to prevent system clashes.</li>
+                <li><strong>Dynamic Autocomplete:</strong> Fully updated the dropdown suggestions to include all new syntax features and keywords.</li>
+                <li><strong>Color System:</strong> <code>if/else</code> highlighted in Gold, <code>true/false</code> highlighted in Orange, and new reserved words in Blue.</li>
+            </ul>
+
             <span class="history-version">0.0.12 beta (THE PERFORMANCE & BUGFIX UPDATE):</span>
             <ul class="history-list">
                 <li><strong>Safe String Logic:</strong> Variables matching words inside strings (e.g., <code>"hello"</code>) will no longer be incorrectly replaced by their values.</li>
@@ -403,10 +429,9 @@
                 if (!filename.endsWith(".ds")) {
                     filename += ".ds";
                 }
-                // BUG FIX 2: VFS Overwrite Protection
                 if (vfs[filename]) {
                     if (!confirm("File '" + filename + "' already exists! Do you want to overwrite it?")) {
-                        return; // Stop if user cancels
+                        return;
                     }
                 }
                 vfs[filename] = editor.getValue();
@@ -430,19 +455,42 @@
 
         // --- COMPILER (DEARSCRIPT TO JAVASCRIPT) ---
         function convertToJS(code, isDom) {
-            // BUG FIX 3: Wrap compiled code in IIFE to prevent variable redeclaration crashes
-            let jsCode = "// Compiled from DearScript v0.0.12\n(() => {\n";
+            let jsCode = "// Compiled from DearScript v0.0.13\n(() => {\n";
             let rawCode = code.replace(/'''([\s\S]*?)'''/g, '/*$1*/').replace(/"""([\s\S]*?)"""/g, '/*$1*/');
             const lines = rawCode.split("\n");
             
+            let indentStack = [];
+            
             lines.forEach(l => {
                 let clean = l.trim();
-                if (clean === "") { jsCode += "\n"; return; }
-                if (clean.startsWith("//") || clean.startsWith("/*")) { jsCode += clean + "\n"; return; }
-                if (clean.startsWith("#")) { jsCode += "//" + clean.substring(1) + "\n"; return; }
+                let currentIndent = l.search(/\S|$/);
+                
+                // Track blocks to append closing braces
+                while (indentStack.length > 0 && currentIndent <= indentStack[indentStack.length - 1]) {
+                    if (clean !== "else:") {
+                        jsCode += "    ".repeat(indentStack.length) + "}\n";
+                        indentStack.pop();
+                    } else {
+                        break; 
+                    }
+                }
 
-                if (clean.startsWith("mi ")) {
-                    jsCode += "    " + clean.replace(/^mi\s+/, "let ") + "\n";
+                if (clean === "") { jsCode += "\n"; return; }
+                if (clean.startsWith("//") || clean.startsWith("/*")) { jsCode += "    ".repeat(indentStack.length + 1) + clean + "\n"; return; }
+                if (clean.startsWith("#")) { jsCode += "    ".repeat(indentStack.length + 1) + "//" + clean.substring(1) + "\n"; return; }
+
+                if (clean.startsWith("if ") && clean.endsWith(":")) {
+                    let cond = clean.substring(3, clean.length - 1).trim();
+                    jsCode += "    ".repeat(indentStack.length + 1) + `if (${cond}) {\n`;
+                    indentStack.push(currentIndent);
+                } else if (clean === "else:") {
+                    if (indentStack.length > 0) {
+                        jsCode += "    ".repeat(indentStack.length) + "} else {\n";
+                    } else {
+                        jsCode += "    } else {\n";
+                    }
+                } else if (clean.startsWith("mi ")) {
+                    jsCode += "    ".repeat(indentStack.length + 1) + clean.replace(/^mi\s+/, "let ") + "\n";
                 } else if (clean.match(/^bik[\s\(\{\[]/)) {
                     let val = clean.replace(/^bik/, "").trim();
                     while (
@@ -453,14 +501,20 @@
                         val = val.substring(1, val.length - 1).trim();
                     }
                     if (isDom) {
-                        jsCode += `    document.write(${val});\n`;
+                        jsCode += "    ".repeat(indentStack.length + 1) + `document.write(${val});\n`;
                     } else {
-                        jsCode += `    console.log(${val});\n`;
+                        jsCode += "    ".repeat(indentStack.length + 1) + `console.log(${val});\n`;
                     }
                 } else {
-                    jsCode += "    " + clean + "\n"; 
+                    jsCode += "    ".repeat(indentStack.length + 1) + clean + "\n"; 
                 }
             });
+            
+            while(indentStack.length > 0) {
+                jsCode += "    ".repeat(indentStack.length) + "}\n";
+                indentStack.pop();
+            }
+            
             jsCode += "})();\n";
             return jsCode;
         }
@@ -535,8 +589,10 @@
                         { token: "comment", regex: "'''", next: "qstring" },
                         { token: "keyword.bik", regex: "\\bbik\\b" }, 
                         { token: "keyword.mi", regex: "\\bmi\\b" }, 
+                        { token: "keyword.ifelse", regex: "\\b(?:if|else)\\b" }, // Gold condition block
+                        { token: "constant.boolean", regex: "\\b(?:true|false)\\b" }, // Orange Booleans
                         { token: "keyword.detytype", regex: "\\b(?:type|dety)\\b" },
-                        { token: "keyword.reserved", regex: "\\b(?:float|string|list|array)\\b" },
+                        { token: "keyword.reserved", regex: "\\b(?:float|string|list|array|intezar|str|floot|Boolean|bool)\\b" }, // Blue reserved list
                         { token: "string", regex: '"(?:[^"\\\\]|\\\\.)*"' }, 
                         { token: "constant.numeric", regex: "[0-9]+" }
                     ],
@@ -571,18 +627,17 @@
             behavioursEnabled: true 
         });
 
-        const defaultCode = `// DearScript v0.0.12 Beta 
-// Bugfix & Performance Update!
+        const defaultCode = `// DearScript v0.0.13 Beta
+// Conditions & Booleans Update!
 
-mi hello = 50;
-mi text = "I am saying hello to you!";
+mi x = 7;
+mi y = 8;
+mi check = true;
 
-// Notice 'hello' inside the string is NOT replaced by 50.
-bik (text)
-
-// The array parser quote bug is fixed!
-mi arr = ["Don't crash my IDE"];
-bik (arr)`;
+if x > y:
+    bik "hello"
+else:
+    bik "not miss"`;
         editor.setValue(defaultCode, -1);
 
         const langTools = ace.require("ace/ext/language_tools");
@@ -591,12 +646,21 @@ bik (arr)`;
                 callback(null, [ 
                     {name:"bik", value:"bik", score:1000, meta: "Print"}, 
                     {name:"mi", value:"mi", score:1000, meta: "Variable"},
+                    {name:"if", value:"if", score:1000, meta: "Condition"},
+                    {name:"else:", value:"else:", score:1000, meta: "Condition"},
+                    {name:"true", value:"true", score:1000, meta: "Boolean"},
+                    {name:"false", value:"false", score:1000, meta: "Boolean"},
                     {name:"dety", value:"dety", score:1000, meta: "TypeCheck"},
                     {name:"type", value:"type", score:1000, meta: "TypeCheck"},
                     {name:"float", value:"float", score:1000, meta: "Reserved"},
                     {name:"string", value:"string", score:1000, meta: "Reserved"},
                     {name:"list", value:"list", score:1000, meta: "Reserved"},
-                    {name:"array", value:"array", score:1000, meta: "Reserved"}
+                    {name:"array", value:"array", score:1000, meta: "Reserved"},
+                    {name:"intezar", value:"intezar", score:1000, meta: "Reserved"},
+                    {name:"str", value:"str", score:1000, meta: "Reserved"},
+                    {name:"floot", value:"floot", score:1000, meta: "Reserved"},
+                    {name:"Boolean", value:"Boolean", score:1000, meta: "Reserved"},
+                    {name:"bool", value:"bool", score:1000, meta: "Reserved"}
                 ]); 
             } 
         });
@@ -606,29 +670,92 @@ bik (arr)`;
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); 
         }
 
-        // PERFORMANCE FIX 1: Ultra-fast Native Regex Comment Parser
         function removeInlineComments(text) {
-            // This safely removes // or # comments, but ignores them if they are inside "quotes" or 'quotes'
-            return text.replace(/(".*?"|'.*?')|(\/\/.*|#.*)/g, (match, stringLiteral) => stringLiteral ? stringLiteral : "").trim();
+            return text.replace(/(".*?"|'.*?')|(\/\/.*|#.*)/g, (match, stringLiteral) => stringLiteral ? stringLiteral : "").trimEnd();
         }
 
-        // --- THE MASTER DEARSCRIPT ENGINE v0.0.12 ---
+        // --- THE MASTER DEARSCRIPT ENGINE v0.0.13 ---
         function engineExecute(code) {
             let rawCode = code.replace(/"""[\s\S]*?"""/g, '').replace(/'''[\s\S]*?'''/g, '');
             const lines = rawCode.split("\n");
             let output = ""; 
             let memory = {};
-            const reservedKw = ["bik", "mi", "dety", "type", "float", "string", "list", "array"];
+            const reservedKw = ["bik", "mi", "dety", "type", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "if", "else", "true", "false"];
             
-            lines.forEach(l => {
-                let clean = removeInlineComments(l);
-                if (clean === "") return; 
+            let skipMode = false;
+            let baseIndent = 0;
+            let lastIfResult = false;
+            let hasActiveIf = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                let rawLine = lines[i];
+                let clean = removeInlineComments(rawLine).trimStart();
+                let indentMatch = rawLine.match(/^\s*/);
+                let indent = indentMatch ? indentMatch[0].length : 0;
                 
-                // 1. VARIABLE ASSIGNMENT (mi)
+                if (clean === "") continue; 
+                
+                // Block Exit Tracker
+                if (indent <= baseIndent && clean !== "else:") {
+                    skipMode = false;
+                    hasActiveIf = false;
+                }
+
+                // Block Skipper
+                if (skipMode && indent > baseIndent) {
+                    continue; 
+                }
+                
+                // 1. IF CONDITION
+                if (clean.startsWith("if ") && clean.endsWith(":")) {
+                    let condition = clean.substring(3, clean.length - 1).trim();
+                    let evalString = condition;
+                    let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
+                    keys.forEach(k => { 
+                        let regex = new RegExp('\\b' + k + '\\b', 'g'); 
+                        evalString = evalString.replace(regex, typeof memory[k] === 'string' ? `"${memory[k]}"` : memory[k]); 
+                    });
+                    
+                    try {
+                        lastIfResult = !!(new Function('return ' + evalString)());
+                    } catch(e) {
+                        output += `<span class="error-text">Condition Error in 'if'</span>\n`;
+                        lastIfResult = false;
+                    }
+
+                    baseIndent = indent;
+                    hasActiveIf = true;
+                    
+                    if (!lastIfResult) {
+                        skipMode = true; 
+                    } else {
+                        skipMode = false; 
+                    }
+                    continue;
+                }
+
+                // 2. ELSE CONDITION
+                if (clean === "else:") {
+                    if (!hasActiveIf) {
+                        output += `<span class="error-text">Syntax Error: 'else:' without preceding 'if:'</span>\n`;
+                        continue;
+                    }
+                    baseIndent = indent;
+                    hasActiveIf = false;
+
+                    if (lastIfResult) {
+                        skipMode = true; 
+                    } else {
+                        skipMode = false; 
+                    }
+                    continue;
+                }
+
+                // 3. VARIABLE ASSIGNMENT (mi)
                 if (clean.startsWith("mi ")) {
                     if (!clean.endsWith(";")) { 
                         output += `<span class="error-text">Syntax Error: missing (;) at the end of variable.</span>\n`; 
-                        return; 
+                        continue; 
                     }
                     
                     let assignment = clean.substring(3, clean.length - 1).trim(); 
@@ -636,7 +763,7 @@ bik (arr)`;
                     
                     if (eqIndex === -1) { 
                         output += `<span class="error-text">Syntax Error: missing '=' in declaration.</span>\n`; 
-                        return; 
+                        continue; 
                     }
                     
                     let varName = assignment.substring(0, eqIndex).trim();
@@ -644,18 +771,20 @@ bik (arr)`;
                     
                     if (!/^[a-zA-Z_]\w*$/.test(varName)) { 
                         output += `<span class="error-text">Syntax Error: invalid variable name '${varName}'</span>\n`; 
-                        return; 
+                        continue; 
                     }
                     if (reservedKw.includes(varName)) {
                         output += `<span class="error-text">Syntax Error: '${varName}' is a reserved keyword and cannot be used as a variable name.</span>\n`;
-                        return;
+                        continue;
                     }
 
                     if (varValue.startsWith('"') && varValue.endsWith('"')) {
                         memory[varName] = varValue.slice(1, -1).replace(/\\"/g, '"'); 
                     } 
+                    else if (varValue === "true" || varValue === "false") {
+                        memory[varName] = (varValue === "true");
+                    }
                     else if (varValue.startsWith('[') && varValue.endsWith(']')) {
-                        // BUG FIX 1: Smart Array Quote Replacer (Only replaces single quotes wrapping strings)
                         try { 
                             let jsonSafe = varValue.replace(/(?:^|\[|,)\s*'([^'\\]*(?:\\.[^'\\]*)*)'\s*(?=\]|,)/g, function(m, p1) { 
                                 return m.replace(/'/g, '"'); 
@@ -666,14 +795,13 @@ bik (arr)`;
                         }
                     } 
                     else {
-                        // BUG FIX 4: Secure Variable Substitution (Ignores strings)
                         let evalString = varValue;
                         let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
                         
                         keys.forEach(k => { 
                             let regex = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g'); 
                             evalString = evalString.replace(regex, (match, isString) => {
-                                if (isString) return match; // Keep string safe!
+                                if (isString) return match;
                                 return typeof memory[k] === 'string' ? `"${memory[k]}"` : JSON.stringify(memory[k]);
                             });
                         });
@@ -690,16 +818,16 @@ bik (arr)`;
                             output += `<span class="error-text">Syntax Error: unsupported value for '${varName}'</span>\n`; 
                         }
                     }
-                    return; 
+                    continue; 
                 }
                 
-                // 2. PRINT COMMAND (bik)
+                // 4. PRINT COMMAND (bik)
                 else if (clean.match(/^bik([\s\(\{\[]|$)/)) {
                     let val = clean.replace(/^bik/, "").trim(); 
                     
                     if (val === "" || val === "()" || val === "[]" || val === "{}") {
                         output += "\n";
-                        return;
+                        continue;
                     }
 
                     while (
@@ -718,13 +846,14 @@ bik (arr)`;
                         if (memory.hasOwnProperty(varNameToCheck)) {
                             let memVal = memory[varNameToCheck];
                             if (Array.isArray(memVal)) output += "array\n";
+                            else if (typeof memVal === 'boolean') output += "boolean\n";
                             else if (typeof memVal === 'number' && memVal % 1 === 0) output += "integer\n";
                             else if (typeof memVal === 'number' && memVal % 1 !== 0) output += "float\n";
                             else if (typeof memVal === 'string') output += "string\n";
                         } else { 
                             output += `<span class="error-text">Reference Error: '${varNameToCheck}' not defined.</span>\n`; 
                         }
-                        return;
+                        continue;
                     }
 
                     if (typeMatch) {
@@ -732,13 +861,14 @@ bik (arr)`;
                         if (memory.hasOwnProperty(varNameToCheck)) {
                             let memVal = memory[varNameToCheck];
                             if (Array.isArray(memVal)) output += "class: list\n";
+                            else if (typeof memVal === 'boolean') output += "class: bool\n";
                             else if (typeof memVal === 'number' && memVal % 1 === 0) output += "class: int\n";
                             else if (typeof memVal === 'number' && memVal % 1 !== 0) output += "class: float\n";
                             else if (typeof memVal === 'string') output += "class: str\n";
                         } else { 
                             output += `<span class="error-text">Reference Error: '${varNameToCheck}' not defined.</span>\n`; 
                         }
-                        return;
+                        continue;
                     }
 
                     if (val.startsWith('"') && (!val.endsWith('"') || val === '""')) {
@@ -752,6 +882,9 @@ bik (arr)`;
                         let innerText = val.slice(1, -1).replace(/\\"/g, '"'); 
                         output += escapeHTML(innerText) + "\n";
                     } 
+                    else if (val === "true" || val === "false") {
+                        output += escapeHTML(val) + "\n";
+                    }
                     else if (memory.hasOwnProperty(val)) {
                         if (Array.isArray(memory[val])) {
                             output += escapeHTML(JSON.stringify(memory[val])) + "\n";
@@ -760,14 +893,13 @@ bik (arr)`;
                         }
                     } 
                     else {
-                        // BUG FIX 4: Secure Variable Substitution for Print (Ignores strings)
                         let evalString = val;
                         let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
                         
                         keys.forEach(k => { 
                             let regex = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g'); 
                             evalString = evalString.replace(regex, (match, isString) => {
-                                if (isString) return match; // Keep string safe!
+                                if (isString) return match; 
                                 return memory[k]; 
                             });
                         });
@@ -775,7 +907,7 @@ bik (arr)`;
                         let undefinedVars = evalString.match(/[a-zA-Z_]\w*/g);
                         if (undefinedVars) {
                             output += `<span class="error-text">Reference Error: '${undefinedVars[0]}' is not defined.</span>\n`;
-                            return;
+                            continue;
                         }
 
                         if (/^[\d\s\+\-\*\/\(\)\.]+$/.test(evalString) && evalString !== "") {
@@ -796,7 +928,7 @@ bik (arr)`;
                 else { 
                     output += `<span class="error-text">Syntax Error: invalid syntax.</span>\n`; 
                 }
-            });
+            }
             
             return output || "Process Finished.";
         }
