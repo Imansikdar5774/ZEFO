@@ -3,154 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DearScript Official IDE - 0.0.14 Beta</title>
-    <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        body { 
-            background: #282a36; 
-            overflow: hidden; 
-            font-family: sans-serif; 
-        }
-
-        /* --- TUMHARE EXACT COLORS --- */
-        .ace_editor { color: #FFFFFF !important; }
-        .ace_keyword.ace_bik { color: #C805F5 !important; font-weight: bold !important; }
-        .ace_keyword.ace_mi { color: #CFAD03 !important; font-weight: bold !important; }
-        .ace_keyword.ace_ifelse { color: #CFAD03 !important; font-weight: bold !important; } 
-        .ace_constant.ace_boolean { color: #F67500 !important; font-weight: bold !important; } 
-        .ace_keyword.ace_detytype { color: #29C254 !important; font-weight: bold !important; }
-        .ace_keyword.ace_reserved { color: #5980F0 !important; font-weight: bold !important; } 
-        .ace_string { color: #008E1D !important; }
-        .ace_constant.ace_numeric { color: #2BB5D6 !important; }
-        .ace_comment { color: #323D55 !important; font-style: italic !important; }
-
-        /* --- TOP BAR & 3-DOT MENU --- */
-        #top-bar {
-            position: absolute; top: 0; left: 0; width: 100%; height: 55px;
-            background: #1e1f29; display: flex; justify-content: space-between;
-            align-items: center; padding: 0 15px; z-index: 1500;
-            border-bottom: 2px solid #323D55; 
-        }
-        #top-bar span { 
-            color: #C805F5; font-weight: bold; font-family: monospace; font-size: 20px; 
-        }
-        
-        .menu-container { position: relative; display: inline-block; }
-        .menu-btn { 
-            background: none; color: #f8f8f2; border: none; 
-            font-size: 28px; cursor: pointer; padding: 0 5px; 
-            font-weight: bold; line-height: 1;
-        }
-        
-        .dropdown-content { 
-            display: none; position: absolute; right: 0; top: 40px;
-            background-color: #282a36; min-width: 180px; 
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); z-index: 2500; 
-            border-radius: 8px; border: 1px solid #C805F5; overflow: hidden;
-        }
-        .dropdown-content a { 
-            color: white; padding: 15px 20px; text-decoration: none; 
-            display: block; cursor: pointer; font-size: 16px; font-weight: bold;
-            border-bottom: 1px solid #323D55;
-        }
-        .dropdown-content a:last-child { border-bottom: none; }
-        .dropdown-content a:hover { background-color: #323D55; color: #50fa7b; }
-        .show { display: block; }
-
-        /* --- EDITOR LAYOUT --- */
-        #editor { 
-            position: absolute; top: 55px; left: 0; 
-            width: 100%; height: calc(100vh - 55px); font-size: 18px; 
-        }
-
-        #run-btn { 
-            position: fixed; bottom: 30px; right: 30px; z-index: 1000;
-            background: #50fa7b; border: none; width: 65px; height: 65px;
-            border-radius: 50%; cursor: pointer; font-size: 24px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-        }
-
-        /* --- NORMAL RUN TERMINAL --- */
-        #terminal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #282a36; color: #FFFFFF; padding: 20px; display: none;
-            flex-direction: column; z-index: 2000;
-        }
-        #out { 
-            font-size: 22px; font-family: monospace; white-space: pre-wrap; margin-top: 15px; 
-        }
-        .error-text { color: #ff5555; }
-
-        /* --- CLI TERMINAL (OS STYLE) --- */
-        #cli-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; color: #0f0; padding: 15px;
-            display: none; flex-direction: column; z-index: 3500; font-family: monospace; font-size: 16px;
-        }
-        .cli-header { 
-            display: flex; justify-content: space-between; border-bottom: 1px solid #333; 
-            padding-bottom: 5px; margin-bottom: 10px; 
-        }
-        #cli-output { 
-            flex-grow: 1; overflow-y: auto; white-space: pre-wrap; margin-bottom: 10px; 
-        }
-        .cli-input-line { display: flex; align-items: center; }
-        .cli-prompt { color: #C805F5; margin-right: 8px; font-weight: bold; }
-        #cli-input { 
-            background: transparent; border: none; color: #0f0; font-family: monospace; 
-            font-size: 16px; flex-grow: 1; outline: none; 
-        }
-
-        /* --- MODALS (Docs & History) --- */
-        .modal-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #282a36; color: #f8f8f2; padding: 20px;
-            display: none; flex-direction: column; z-index: 3000; overflow-y: auto; line-height: 1.6;
-        }
-        .docs-header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 2px solid #C805F5; padding-bottom: 15px; margin-bottom: 20px; 
-        }
-        .docs-title-container { display: flex; flex-direction: column; }
-        .docs-title { color: #C805F5; font-size: 24px; font-weight: bold; }
-        .close-docs { 
-            background: #ff5555; color: white; border: none; padding: 8px 15px; 
-            border-radius: 4px; font-weight: bold; cursor: pointer; height: fit-content; 
-        }
-        
-        .docs-section { margin-bottom: 20px; background: #1e1f29; padding: 20px; border-radius: 8px; }
-        .docs-h3 { color: #50fa7b; margin-bottom: 15px; font-size: 20px; }
-        .docs-section p { font-size: 16px; margin-bottom: 10px; color: #e2e2e2; }
-        
-        .code-box { 
-            background: #000; padding: 15px; border-radius: 8px; font-family: monospace; 
-            color: #f8f8f2; margin: 10px 0; font-size: 16px; 
-        }
-        .code-box span.p { color: #C805F5; font-weight: bold; }
-        .code-box span.mi-kw { color: #CFAD03; font-weight: bold; }
-        .code-box span.if-kw { color: #CFAD03; font-weight: bold; }
-        .code-box span.bool-kw { color: #F67500; font-weight: bold; }
-        .code-box span.type-kw { color: #29C254; font-weight: bold; }
-        .code-box span.s { color: #008E1D; }
-        .docs-error { 
-            color: #ff5555; font-family: monospace; background: #0b0b0b; 
-            padding: 5px 8px; border-radius: 4px; display: inline-block; margin-top: 5px; 
-        }
-        
-        ul { padding-left: 20px; }
-        li { margin-bottom: 15px; color: #e2e2e2; }
-        
-        .history-version { 
-            color: #2BB5D6; font-weight: bold; font-family: monospace; 
-            font-size: 18px; display: block; margin-bottom: 5px; margin-top: 10px;
-        }
-        .history-list { margin-bottom: 0; padding-left: 15px;}
-        .history-list li { margin-bottom: 5px; color: #a8a8b2; font-size: 15px; }
-    </style>
+    <title>DearScript Official IDE - 0.0.15 Beta</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -159,7 +13,8 @@
         <div class="menu-container">
             <button class="menu-btn" onclick="toggleMenu()">⋮</button>
             <div id="myDropdown" class="dropdown-content">
-                <a onclick="saveFile()">💾 Save File</a>
+                <a onclick="openFileManager()">📂 File Manager</a>
+                <a onclick="downloadJSFile('main.ds', editor.getValue())">📥 Download (Device)</a>
                 <a onclick="openCLI()">💻 Terminal</a>
                 <a onclick="openModal('docs-modal')">📖 Docs</a>
                 <a onclick="openModal('history-modal')">🕒 History</a>
@@ -175,9 +30,26 @@
         <div id="out"></div>
     </div>
 
+    <div id="fm-modal" class="modal-bg">
+        <div class="docs-header">
+            <div class="docs-title-container">
+                <div class="docs-title">File Manager</div>
+                <div class="docs-title" style="color:white; font-size: 16px;">Virtual File System</div>
+            </div>
+            <button class="close-docs" onclick="closeModal('fm-modal')">CLOSE</button>
+        </div>
+        <div class="fm-toolbar">
+            <button class="fm-btn" onclick="createNewFile()">+ New File</button>
+            <button class="fm-btn" style="background: #C805F5;" onclick="createNewFolder()">+ New Folder</button>
+            <button class="fm-btn" style="background: #29C254;" onclick="saveCurrentToFile()">💾 Save Current</button>
+        </div>
+        <div id="fm-file-list" class="fm-list">
+            </div>
+    </div>
+
     <div id="cli-modal">
         <div class="cli-header">
-            <span style="color:#C805F5; font-weight:bold;">DearScript OS Terminal v0.0.14</span>
+            <span style="color:#C805F5; font-weight:bold;">DearScript OS Terminal v0.0.15</span>
             <button onclick="document.getElementById('cli-modal').style.display='none'" style="background:#ff5555; color:white; border:none; padding:5px 10px; cursor:pointer; font-weight:bold;">EXIT</button>
         </div>
         <div id="cli-output">Welcome to DearScript OS. File system initialized.<br>Type 'ls' to see files. Type 'ds filename.ds' to run.<br>Compile to JS using 'ds filename.ds convert js'</div>
@@ -269,21 +141,12 @@
         </div>
         
         <div class="docs-section">
-            <h3 class="docs-h3">8. Terminal & File System</h3>
-            <p>DearScript comes with its own Virtual OS. Click the 3-dot menu -> Save File. Then open Terminal to manage your files!</p>
+            <h3 class="docs-h3">8. File System & Compilation</h3>
+            <p>DearScript comes with its own Virtual OS. You can save, open, and compile files from the terminal or the new File Manager.</p>
             <ul>
-                <li><code>ls</code> - View saved files in storage</li>
+                <li><code>ls</code> - View saved files</li>
                 <li><code>ds filename.ds</code> - Execute a saved file</li>
-                <li><code>clear</code> - Clear terminal screen</li>
-            </ul>
-        </div>
-
-        <div class="docs-section">
-            <h3 class="docs-h3">9. Compiler (Convert to JS)</h3>
-            <p>Convert your DearScript files into native JavaScript code and download them automatically.</p>
-            <ul>
-                <li><code>ds filename.ds convert js</code> - Converts <code>bik</code> to <code>console.log</code>.</li>
-                <li><code>ds filename.ds convert js dom</code> - Converts <code>bik</code> to <code>document.write</code>.</li>
+                <li><code>ds filename.ds convert js</code> - Compiles to JS and prompts download!</li>
             </ul>
         </div>
     </div>
@@ -298,9 +161,18 @@
         </div>
 
         <div class="docs-section">
+            <span class="history-version">0.0.15 beta (THE UX & LINTER UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Error Linter:</strong> Real-time syntax checker added. Forgetting a <code>;</code> or <code>:</code> now shows a red <code>(!)</code> in the editor margin!</li>
+                <li><strong>Premium Autocomplete:</strong> Fully customized the autocomplete dropdown to match the Dracula Dark theme. Fixed green highlight bug.</li>
+                <li><strong>Empty Default & Auto-Save:</strong> The editor now loads empty by default, and continuously Auto-Saves your progress even if you exit the app.</li>
+                <li><strong>File Manager:</strong> Added a dedicated File Manager UI (under 3-dots) to handle creating folders, new files, and saving easily.</li>
+                <li><strong>Native Device Download:</strong> Hitting Download or converting via terminal natively triggers your mobile's File Manager download prompt.</li>
+            </ul>
+
             <span class="history-version">0.0.14 beta (LOGIC & PERFORMANCE UPDATE):</span>
             <ul class="history-list">
-                <li><strong>Regex Caching (Speed Boost):</strong> Drastically improved engine speed by caching `RegExp` objects, removing heavy memory loops.</li>
+                <li><strong>Regex Caching (Speed Boost):</strong> Drastically improved engine speed by caching RegExp objects, removing heavy memory loops.</li>
                 <li><strong>Boolean Expressions in Variables:</strong> Math regex now supports logical operators (<code>&gt;, &lt;, ==, !=, &amp;, |</code>), allowing variables to store boolean logic (e.g. <code>mi res = 5 &gt; 3;</code>).</li>
                 <li><strong>If Condition Array Bug:</strong> Fixed logical bug where arrays inside an <code>if</code> statement evaluated incorrectly.</li>
                 <li><strong>Strict Skip/Else Logic:</strong> Hardened the indentation parser so blank lines or misplaced tabs don't falsely trigger an "Else Without If" crash.</li>
@@ -321,7 +193,7 @@
                 <li><strong>Smart Array Quotes:</strong> Fixed the <code>JSON.parse</code> issue where strings with apostrophes (like <code>"Don't"</code>) would crash the array.</li>
                 <li><strong>VFS Overwrite Protection:</strong> Added a safe prompt when saving a file that already exists to prevent accidental code loss.</li>
                 <li><strong>Compiler IIFE Wrap:</strong> Compiled JS code is now safely wrapped in an IIFE <code>(() => {})();</code> to prevent variable redeclaration conflicts in the browser.</li>
-                <li><strong>Ultra-Fast Comment Parser:</strong> Replaced the slow character-by-character loop with a native robust Regex, making the parser exponentially faster.</li>
+                <li><strong>Ultra-Fast Comment Parser:</strong> Replaced the slow character-by-character loop with a native robust Regex, making the parser exponentially faster for large codebases.</li>
             </ul>
 
             <span class="history-version">0.0.11 beta (SYNTAX & AUTOCOMPLETE UPDATE):</span>
@@ -401,569 +273,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.15.0/theme-dracula.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.15.0/ext-language_tools.min.js"></script>
 
-    <script>
-        // --- UI & MODALS LOGIC ---
-        function toggleMenu() { 
-            document.getElementById("myDropdown").classList.toggle("show"); 
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.menu-btn')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    if (dropdowns[i].classList.contains('show')) {
-                        dropdowns[i].classList.remove('show');
-                    }
-                }
-            }
-        }
-
-        function openModal(id) { 
-            document.getElementById("myDropdown").classList.remove('show'); 
-            document.getElementById(id).style.display = 'flex'; 
-        }
-
-        function closeModal(id) { 
-            document.getElementById(id).style.display = 'none'; 
-        }
-
-        // --- VIRTUAL FILE SYSTEM LOGIC ---
-        let vfs = JSON.parse(localStorage.getItem('ds_vfs')) || {};
-        
-        function saveFile() {
-            document.getElementById("myDropdown").classList.remove('show');
-            let filename = prompt("Enter File name (e.g. main.ds):", "main.ds");
-            if (filename) {
-                if (!filename.endsWith(".ds")) {
-                    filename += ".ds";
-                }
-                if (vfs[filename]) {
-                    if (!confirm("File '" + filename + "' already exists! Do you want to overwrite it?")) {
-                        return;
-                    }
-                }
-                vfs[filename] = editor.getValue();
-                localStorage.setItem('ds_vfs', JSON.stringify(vfs));
-                alert("File '" + filename + "' saved successfully to Storage!");
-            }
-        }
-
-        // --- DOWNLOAD JS FILE LOGIC ---
-        function downloadJSFile(filename, content) {
-            const blob = new Blob([content], { type: 'text/javascript' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click(); 
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // --- COMPILER (DEARSCRIPT TO JAVASCRIPT) ---
-        function convertToJS(code, isDom) {
-            let jsCode = "// Compiled from DearScript v0.0.14\n(() => {\n";
-            let rawCode = code.replace(/'''([\s\S]*?)'''/g, '/*$1*/').replace(/"""([\s\S]*?)"""/g, '/*$1*/');
-            const lines = rawCode.split("\n");
-            
-            let indentStack = [];
-            
-            lines.forEach(l => {
-                let clean = l.trim();
-                let currentIndent = l.search(/\S|$/);
-                
-                while (indentStack.length > 0 && currentIndent <= indentStack[indentStack.length - 1]) {
-                    if (clean !== "else:") {
-                        jsCode += "    ".repeat(indentStack.length) + "}\n";
-                        indentStack.pop();
-                    } else {
-                        break; 
-                    }
-                }
-
-                if (clean === "") { jsCode += "\n"; return; }
-                if (clean.startsWith("//") || clean.startsWith("/*")) { jsCode += "    ".repeat(indentStack.length + 1) + clean + "\n"; return; }
-                if (clean.startsWith("#")) { jsCode += "    ".repeat(indentStack.length + 1) + "//" + clean.substring(1) + "\n"; return; }
-
-                if (clean.startsWith("if ") && clean.endsWith(":")) {
-                    let cond = clean.substring(3, clean.length - 1).trim();
-                    jsCode += "    ".repeat(indentStack.length + 1) + `if (${cond}) {\n`;
-                    indentStack.push(currentIndent);
-                } else if (clean === "else:") {
-                    if (indentStack.length > 0) {
-                        jsCode += "    ".repeat(indentStack.length) + "} else {\n";
-                    } else {
-                        jsCode += "    } else {\n";
-                    }
-                } else if (clean.startsWith("mi ")) {
-                    jsCode += "    ".repeat(indentStack.length + 1) + clean.replace(/^mi\s+/, "let ") + "\n";
-                } else if (clean.match(/^bik[\s\(\{\[]/)) {
-                    let val = clean.replace(/^bik/, "").trim();
-                    while (
-                        (val.startsWith("(") && val.endsWith(")")) ||
-                        (val.startsWith("[") && val.endsWith("]")) ||
-                        (val.startsWith("{") && val.endsWith("}"))
-                    ) {
-                        val = val.substring(1, val.length - 1).trim();
-                    }
-                    if (isDom) {
-                        jsCode += "    ".repeat(indentStack.length + 1) + `document.write(${val});\n`;
-                    } else {
-                        jsCode += "    ".repeat(indentStack.length + 1) + `console.log(${val});\n`;
-                    }
-                } else {
-                    jsCode += "    ".repeat(indentStack.length + 1) + clean + "\n"; 
-                }
-            });
-            
-            while(indentStack.length > 0) {
-                jsCode += "    ".repeat(indentStack.length) + "}\n";
-                indentStack.pop();
-            }
-            
-            jsCode += "})();\n";
-            return jsCode;
-        }
-
-        // --- CLI TERMINAL LOGIC ---
-        function openCLI() {
-            document.getElementById("myDropdown").classList.remove('show');
-            document.getElementById('cli-modal').style.display = 'flex';
-            document.getElementById('cli-input').focus();
-        }
-
-        function printCLI(text) {
-            const out = document.getElementById('cli-output');
-            out.innerHTML += "\n" + text; 
-            out.scrollTop = out.scrollHeight;
-        }
-
-        function handleCLI(e) {
-            if (e.key === 'Enter') {
-                let input = e.target.value.trim();
-                e.target.value = '';
-                printCLI("> " + escapeHTML(input));
-                
-                if (input.startsWith("ds ")) {
-                    let parts = input.split(" ");
-                    let fname = parts[1];
-                    if (!fname.endsWith(".ds")) {
-                        fname += ".ds";
-                    }
-
-                    if (parts.length >= 4 && parts[2] === "convert" && parts[3] === "js") {
-                        let isDom = (parts[4] === "dom");
-                        if (vfs[fname]) {
-                            let jsContent = convertToJS(vfs[fname], isDom);
-                            let jsFilename = fname.replace(".ds", ".js");
-                            downloadJSFile(jsFilename, jsContent);
-                            printCLI(`Success: Compiled '${fname}' to JavaScript.`);
-                        } else {
-                            printCLI(`<span style="color:#ff5555">Error: file '${fname}' not found.</span>`);
-                        }
-                    } else {
-                        if (vfs[fname]) {
-                            let result = engineExecute(vfs[fname]);
-                            let tempDiv = document.createElement("div");
-                            tempDiv.innerHTML = result;
-                            printCLI(escapeHTML(tempDiv.innerText));
-                        } else {
-                            printCLI(`<span style="color:#ff5555">Error: file '${fname}' not found.</span>`);
-                        }
-                    }
-                } else if (input === "ls") {
-                    let files = Object.keys(vfs);
-                    printCLI(files.length > 0 ? files.join("   ") : "No files saved.");
-                } else if (input === "clear") {
-                    document.getElementById('cli-output').innerHTML = "Terminal cleared.";
-                } else if (input !== "") {
-                    printCLI("Unknown command: '" + escapeHTML(input) + "'.");
-                }
-            }
-        }
-
-        // --- ACE EDITOR HIGHLIGHTING SETUP ---
-        ace.define('ace/mode/ds_highlight_rules', function(require, exports, module) {
-            var oop = require("ace/lib/oop");
-            var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightRules;
-            var dsHighlightRules = function() {
-                this.$rules = {
-                    "start": [
-                        { token: "comment", regex: "//.*" }, 
-                        { token: "comment", regex: "#.*" },
-                        { token: "comment", regex: '"""', next: "qqstring" },
-                        { token: "comment", regex: "'''", next: "qstring" },
-                        { token: "keyword.bik", regex: "\\bbik\\b" }, 
-                        { token: "keyword.mi", regex: "\\bmi\\b" }, 
-                        { token: "keyword.ifelse", regex: "\\b(?:if|else)\\b" }, 
-                        { token: "constant.boolean", regex: "\\b(?:true|false)\\b" }, 
-                        { token: "keyword.detytype", regex: "\\b(?:type|dety)\\b" },
-                        { token: "keyword.reserved", regex: "\\b(?:float|string|list|array|intezar|str|floot|Boolean|bool)\\b" }, 
-                        { token: "string", regex: '"(?:[^"\\\\]|\\\\.)*"' }, 
-                        { token: "constant.numeric", regex: "[0-9]+" }
-                    ],
-                    "qqstring": [ { token: "comment", regex: '"""', next: "start" }, { defaultToken: "comment" } ],
-                    "qstring": [ { token: "comment", regex: "'''", next: "start" }, { defaultToken: "comment" } ]
-                };
-            };
-            oop.inherits(dsHighlightRules, TextHighlightRules); 
-            exports.dsHighlightRules = dsHighlightRules;
-        });
-
-        ace.define('ace/mode/dearscript', function(require, exports, module) {
-            var oop = require("ace/lib/oop"); 
-            var TextMode = require("ace/mode/text").Mode;
-            var dsHighlightRules = require("ace/mode/ds_highlight_rules").dsHighlightRules;
-            var CstyleBehaviour = require("ace/mode/behaviour/cstyle").CstyleBehaviour;
-            var Mode = function() { 
-                this.HighlightRules = dsHighlightRules; 
-                this.$behaviour = new CstyleBehaviour(); 
-            };
-            oop.inherits(Mode, TextMode); 
-            exports.Mode = Mode;
-        });
-
-        const editor = ace.edit("editor");
-        editor.setTheme("ace/theme/dracula");
-        editor.session.setMode("ace/mode/dearscript");
-        editor.setOptions({ 
-            enableBasicAutocompletion: true, 
-            enableLiveAutocompletion: true, 
-            showPrintMargin: false, 
-            behavioursEnabled: true 
-        });
-
-        const defaultCode = `// DearScript v0.0.14 Beta (Performance & Logic Update)
-
-mi power = 100;
-mi limit = 50;
-
-// Test new boolean operator support
-mi isStrong = power > limit;
-
-if isStrong:
-    bik "Engine is running at Max Speed!"
-else:
-    bik "Engine is slow."
-    
-bik (type(isStrong))`;
-        editor.setValue(defaultCode, -1);
-
-        const langTools = ace.require("ace/ext/language_tools");
-        langTools.addCompleter({ 
-            getCompletions: function(editor, session, pos, prefix, callback) { 
-                callback(null, [ 
-                    {name:"bik", value:"bik", score:1000, meta: "Print"}, 
-                    {name:"mi", value:"mi", score:1000, meta: "Variable"},
-                    {name:"if", value:"if", score:1000, meta: "Condition"},
-                    {name:"else:", value:"else:", score:1000, meta: "Condition"},
-                    {name:"true", value:"true", score:1000, meta: "Boolean"},
-                    {name:"false", value:"false", score:1000, meta: "Boolean"},
-                    {name:"dety", value:"dety", score:1000, meta: "TypeCheck"},
-                    {name:"type", value:"type", score:1000, meta: "TypeCheck"},
-                    {name:"float", value:"float", score:1000, meta: "Reserved"},
-                    {name:"string", value:"string", score:1000, meta: "Reserved"},
-                    {name:"list", value:"list", score:1000, meta: "Reserved"},
-                    {name:"array", value:"array", score:1000, meta: "Reserved"},
-                    {name:"intezar", value:"intezar", score:1000, meta: "Reserved"},
-                    {name:"str", value:"str", score:1000, meta: "Reserved"},
-                    {name:"floot", value:"floot", score:1000, meta: "Reserved"},
-                    {name:"Boolean", value:"Boolean", score:1000, meta: "Reserved"},
-                    {name:"bool", value:"bool", score:1000, meta: "Reserved"}
-                ]); 
-            } 
-        });
-
-        // --- HELPER FUNCTIONS ---
-        function escapeHTML(str) { 
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); 
-        }
-
-        function removeInlineComments(text) {
-            return text.replace(/(".*?"|'.*?')|(\/\/.*|#.*)/g, (match, stringLiteral) => stringLiteral ? stringLiteral : "").trimEnd();
-        }
-
-        // --- THE MASTER DEARSCRIPT ENGINE v0.0.14 ---
-        function engineExecute(code) {
-            let rawCode = code.replace(/"""[\s\S]*?"""/g, '').replace(/'''[\s\S]*?'''/g, '');
-            const lines = rawCode.split("\n");
-            let output = ""; 
-            let memory = {};
-            const reservedKw = ["bik", "mi", "dety", "type", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "if", "else", "true", "false"];
-            
-            let skipMode = false;
-            let baseIndent = 0;
-            let lastIfResult = false;
-            let hasActiveIf = false;
-
-            // BUG FIX 4: Regex Caching (No more creating 1000s of regex loops!)
-            let regexCache = {};
-
-            for (let i = 0; i < lines.length; i++) {
-                let rawLine = lines[i];
-                let clean = removeInlineComments(rawLine).trimStart();
-                let indentMatch = rawLine.match(/^\s*/);
-                let indent = indentMatch ? indentMatch[0].length : 0;
-                
-                if (clean === "") continue; 
-                
-                // BUG FIX 3: Strict Skip/Else Tracking
-                if (indent <= baseIndent && clean !== "else:") {
-                    skipMode = false;
-                    hasActiveIf = false;
-                }
-
-                if (skipMode && indent > baseIndent) {
-                    continue; 
-                }
-                
-                // 1. IF CONDITION
-                if (clean.startsWith("if ") && clean.endsWith(":")) {
-                    let condition = clean.substring(3, clean.length - 1).trim();
-                    let evalString = condition;
-                    let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
-                    
-                    keys.forEach(k => { 
-                        if (!regexCache[k]) {
-                            regexCache[k] = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g');
-                        }
-                        // BUG FIX 1: If-Array Bug Fix
-                        evalString = evalString.replace(regexCache[k], (match, isString) => {
-                            if (isString) return match;
-                            return typeof memory[k] === 'string' ? `"${memory[k]}"` : JSON.stringify(memory[k]);
-                        });
-                    });
-                    
-                    try {
-                        lastIfResult = !!(new Function('return ' + evalString)());
-                    } catch(e) {
-                        output += `<span class="error-text">Condition Error in 'if'</span>\n`;
-                        lastIfResult = false;
-                    }
-
-                    baseIndent = indent;
-                    hasActiveIf = true;
-                    
-                    if (!lastIfResult) {
-                        skipMode = true; 
-                    } else {
-                        skipMode = false; 
-                    }
-                    continue;
-                }
-
-                // 2. ELSE CONDITION
-                if (clean === "else:") {
-                    if (!hasActiveIf) {
-                        output += `<span class="error-text">Syntax Error: 'else:' without preceding 'if:'</span>\n`;
-                        continue;
-                    }
-                    baseIndent = indent;
-                    hasActiveIf = false; // consume the if
-
-                    if (lastIfResult) {
-                        skipMode = true; 
-                    } else {
-                        skipMode = false; 
-                    }
-                    continue;
-                }
-
-                // 3. VARIABLE ASSIGNMENT (mi)
-                if (clean.startsWith("mi ")) {
-                    if (!clean.endsWith(";")) { 
-                        output += `<span class="error-text">Syntax Error: missing (;) at the end of variable.</span>\n`; 
-                        continue; 
-                    }
-                    
-                    let assignment = clean.substring(3, clean.length - 1).trim(); 
-                    let eqIndex = assignment.indexOf('=');
-                    
-                    if (eqIndex === -1) { 
-                        output += `<span class="error-text">Syntax Error: missing '=' in declaration.</span>\n`; 
-                        continue; 
-                    }
-                    
-                    let varName = assignment.substring(0, eqIndex).trim();
-                    let varValue = assignment.substring(eqIndex + 1).trim();
-                    
-                    if (!/^[a-zA-Z_]\w*$/.test(varName)) { 
-                        output += `<span class="error-text">Syntax Error: invalid variable name '${varName}'</span>\n`; 
-                        continue; 
-                    }
-                    if (reservedKw.includes(varName)) {
-                        output += `<span class="error-text">Syntax Error: '${varName}' is a reserved keyword and cannot be used as a variable name.</span>\n`;
-                        continue;
-                    }
-
-                    if (varValue.startsWith('"') && varValue.endsWith('"')) {
-                        memory[varName] = varValue.slice(1, -1).replace(/\\"/g, '"'); 
-                    } 
-                    else if (varValue === "true" || varValue === "false") {
-                        memory[varName] = (varValue === "true");
-                    }
-                    else if (varValue.startsWith('[') && varValue.endsWith(']')) {
-                        try { 
-                            let jsonSafe = varValue.replace(/(?:^|\[|,)\s*'([^'\\]*(?:\\.[^'\\]*)*)'\s*(?=\]|,)/g, function(m, p1) { 
-                                return m.replace(/'/g, '"'); 
-                            });
-                            memory[varName] = JSON.parse(jsonSafe); 
-                        } catch(e) { 
-                            output += `<span class="error-text">Array Syntax Error: Invalid format. Use double quotes for strings inside lists.</span>\n`; 
-                        }
-                    } 
-                    else {
-                        let evalString = varValue;
-                        let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
-                        
-                        keys.forEach(k => { 
-                            if (!regexCache[k]) {
-                                regexCache[k] = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g');
-                            }
-                            evalString = evalString.replace(regexCache[k], (match, isString) => {
-                                if (isString) return match;
-                                return typeof memory[k] === 'string' ? `"${memory[k]}"` : JSON.stringify(memory[k]);
-                            });
-                        });
-                        
-                        // BUG FIX 2: Added Boolean Logic Operators (>, <, ==, !=, &, |) to Match Parser
-                        if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|]+$/.test(evalString) && evalString !== "") {
-                            try { 
-                                memory[varName] = new Function('return ' + evalString)(); 
-                            } catch (e) { 
-                                output += `<span class="error-text">Math/Logic Error in variable '${varName}'</span>\n`; 
-                            }
-                        } else if (/^".*"$/.test(evalString)) {
-                            memory[varName] = evalString.slice(1, -1);
-                        } else { 
-                            output += `<span class="error-text">Syntax Error: unsupported value for '${varName}'</span>\n`; 
-                        }
-                    }
-                    continue; 
-                }
-                
-                // 4. PRINT COMMAND (bik)
-                else if (clean.match(/^bik([\s\(\{\[]|$)/)) {
-                    let val = clean.replace(/^bik/, "").trim(); 
-                    
-                    if (val === "" || val === "()" || val === "[]" || val === "{}") {
-                        output += "\n";
-                        continue;
-                    }
-
-                    while (
-                        (val.startsWith("(") && val.endsWith(")")) ||
-                        (val.startsWith("[") && val.endsWith("]")) ||
-                        (val.startsWith("{") && val.endsWith("}"))
-                    ) {
-                        val = val.substring(1, val.length - 1).trim();
-                    }
-
-                    let detyMatch = val.match(/^dety\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("dety ") ? [null, val.replace(/^dety\s*/, "")] : null);
-                    let typeMatch = val.match(/^type\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("type ") ? [null, val.replace(/^type\s*/, "")] : null);
-
-                    if (detyMatch) {
-                        let varNameToCheck = detyMatch[1].trim();
-                        if (memory.hasOwnProperty(varNameToCheck)) {
-                            let memVal = memory[varNameToCheck];
-                            if (Array.isArray(memVal)) output += "array\n";
-                            else if (typeof memVal === 'boolean') output += "boolean\n";
-                            else if (typeof memVal === 'number' && memVal % 1 === 0) output += "integer\n";
-                            else if (typeof memVal === 'number' && memVal % 1 !== 0) output += "float\n";
-                            else if (typeof memVal === 'string') output += "string\n";
-                        } else { 
-                            output += `<span class="error-text">Reference Error: '${varNameToCheck}' not defined.</span>\n`; 
-                        }
-                        continue;
-                    }
-
-                    if (typeMatch) {
-                        let varNameToCheck = typeMatch[1].trim();
-                        if (memory.hasOwnProperty(varNameToCheck)) {
-                            let memVal = memory[varNameToCheck];
-                            if (Array.isArray(memVal)) output += "class: list\n";
-                            else if (typeof memVal === 'boolean') output += "class: bool\n";
-                            else if (typeof memVal === 'number' && memVal % 1 === 0) output += "class: int\n";
-                            else if (typeof memVal === 'number' && memVal % 1 !== 0) output += "class: float\n";
-                            else if (typeof memVal === 'string') output += "class: str\n";
-                        } else { 
-                            output += `<span class="error-text">Reference Error: '${varNameToCheck}' not defined.</span>\n`; 
-                        }
-                        continue;
-                    }
-
-                    if (val.startsWith('"') && (!val.endsWith('"') || val === '""')) {
-                        if(val === '""') {
-                            output += "\n"; 
-                        } else {
-                            output += `<span class="error-text">Syntax Error: missing (").</span>\n`;
-                        }
-                    } 
-                    else if (val.startsWith('"') && val.endsWith('"') && val.length >= 2) {
-                        let innerText = val.slice(1, -1).replace(/\\"/g, '"'); 
-                        output += escapeHTML(innerText) + "\n";
-                    } 
-                    else if (val === "true" || val === "false") {
-                        output += escapeHTML(val) + "\n";
-                    }
-                    else if (memory.hasOwnProperty(val)) {
-                        if (Array.isArray(memory[val])) {
-                            output += escapeHTML(JSON.stringify(memory[val])) + "\n";
-                        } else {
-                            output += escapeHTML(String(memory[val])) + "\n";
-                        }
-                    } 
-                    else {
-                        let evalString = val;
-                        let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
-                        
-                        keys.forEach(k => { 
-                            if (!regexCache[k]) {
-                                regexCache[k] = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g');
-                            }
-                            evalString = evalString.replace(regexCache[k], (match, isString) => {
-                                if (isString) return match; 
-                                return memory[k]; 
-                            });
-                        });
-
-                        let undefinedVars = evalString.match(/[a-zA-Z_]\w*/g);
-                        if (undefinedVars) {
-                            output += `<span class="error-text">Reference Error: '${undefinedVars[0]}' is not defined.</span>\n`;
-                            continue;
-                        }
-
-                        // Added Boolean logic operators here too!
-                        if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|]+$/.test(evalString) && evalString !== "") {
-                            if (/[\+\-\*\/]{2,}/.test(evalString.replace(/\s+/g,''))) { 
-                                output += `<span class="error-text">Math Error</span>\n`; 
-                            } else { 
-                                try { 
-                                    output += new Function('return ' + evalString)() + "\n"; 
-                                } catch (e) { 
-                                    output += `<span class="error-text">Math/Logic Error</span>\n`; 
-                                } 
-                            }
-                        } else { 
-                            output += `<span class="error-text">Syntax Error: Invalid expression.</span>\n`; 
-                        }
-                    }
-                } 
-                else { 
-                    output += `<span class="error-text">Syntax Error: invalid syntax.</span>\n`; 
-                }
-            }
-            
-            return output || "Process Finished.";
-        }
-
-        // --- EXECUTE FROM UI BUTTON ---
-        function runDirectly() {
-            let result = engineExecute(editor.getValue());
-            document.getElementById("out").innerHTML = result;
-            document.getElementById("terminal").style.display = "flex";
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
