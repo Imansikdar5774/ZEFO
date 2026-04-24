@@ -1,23 +1,46 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <link rel="stylesheet" href="style.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>this is a editor</title>
-</head>
-
-<body>
-  <!--normal text editor -->
-  <textarea id="editor"></textarea> <br>
-  <!-- run button -->
-  <button id="runBtn">RUN</button><br>
-  <!-- output box-->
-  <div id="output-box">
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>demo app</title>
     
-  </div>
-  <script src="script.js" type="text/javascript" charset="utf-8"></script>
-</body>
-
+  </head>
+  <body>
+    <!-- contain -->
+    <div class="contain">
+      <!-- page -->
+      <div class="page">
+        <!-- search -->
+        <div class="upar">
+          <!-- logo -->
+          <div class="logo"></div>
+          <!-- search -->
+          <div class="search">
+            <input type="search" placeholder="search">
+          </div>
+          <!-- app name -->
+          <div class="name">
+            <h1>Cumemove <br> Game</h1>
+          </div>
+        </div>
+        <hr />
+        <br>
+        <!-- main box-->
+        <div class="screen">
+          <div class="box"></div>
+        </div>
+        <hr />
+        <br>
+        <!-- box controller -->
+        <div class="control">
+          <div class="W">W</div><br>
+          <div class="A">A</div><br>
+          <div class="D">D</div><br>
+          <div class="S">S</div><br>
+        </div>
+      </div>
+    </div>
+    <script src="script.js" type="text/javascript" charset="utf-8"></script>
+  </body>
 </html>
