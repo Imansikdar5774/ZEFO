@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DearScript Official IDE - 0.0.15 Beta</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="top-bar">
+        <span>DearScript IDE</span>
+        <div class="menu-container">
+            <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+            <div id="myDropdown" class="dropdown-content">
+                <a onclick="openFileManager()">📂 File Manager</a>
+                <a onclick="downloadJSFile('main.ds', editor.getValue())">📥 Download (Device)</a>
+                <a onclick="openCLI()">💻 Terminal</a>
+                <a onclick="openModal('docs-modal')">📖 Docs</a>
+                <a onclick="openModal('history-modal')">🕒 History</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="editor"></div>
+    <button id="run-btn" onclick="runDirectly()">▶</button>
+
+    <div id="terminal">
+        <button onclick="document.getElementById('terminal').style.display='none'" style="background:#ff5555; color:white; border:none; padding:10px; width:80px; border-radius:5px; font-weight:bold;">BACK</button>
+        <div id="out"></div>
+    </div>
+
+    <div id="fm-modal" class="modal-bg">
+        <div class="docs-header">
+            <div class="docs-title-container">
+                <div class="docs-title">File Manager</div>
+                <div class="docs-title" style="color:white; font-size: 16px;">Virtual File System</div>
+            </div>
+            <button class="close-docs" onclick="closeModal('fm-modal')">CLOSE</button>
+        </div>
+        <div class="fm-toolbar">
+            <button class="fm-btn" onclick="createNewFile()">+ New File</button>
+            <button class="fm-btn" style="background: #C805F5;" onclick="createNewFolder()">+ New Folder</button>
+            <button class="fm-btn" style="background: #29C254;" onclick="saveCurrentToFile()">💾 Save Current</button>
+        </div>
+        <div id="fm-file-list" class="fm-list">
+            </div>
+    </div>
+
+    <div id="cli-modal">
+        <div class="cli-header">
+            <span style="color:#C805F5; font-weight:bold;">DearScript OS Terminal v0.0.15</span>
+            <button onclick="document.getElementById('cli-modal').style.display='none'" style="background:#ff5555; color:white; border:none; padding:5px 10px; cursor:pointer; font-weight:bold;">EXIT</button>
+        </div>
+        <div id="cli-output">Welcome to DearScript OS. File system initialized.<br>Type 'ls' to see files. Type 'ds filename.ds' to run.<br>Compile to JS using 'ds filename.ds convert js'</div>
+        <div class="cli-input-line">
+            <span class="cli-prompt">user@ds:~$</span>
+            <input type="text" id="cli-input" autocomplete="off" spellcheck="false" autocapitalize="none" onkeydown="handleCLI(event)">
+        </div>
+    </div>
+
+    <div id="docs-modal" class="modal-bg">
+        <div class="docs-header">
+            <div class="docs-title-container">
+                <div class="docs-title">DearScript</div>
+                <div class="docs-title" style="color:white; font-size: 18px;">Documentation</div>
+            </div>
+            <button class="close-docs" onclick="closeModal('docs-modal')">CLOSE</button>
+        </div>
+        <div class="docs-section">
+            <h3 class="docs-h3">1. Introduction</h3>
+            <p>DearScript is a fast, beginner-friendly programming language. It removes the strict need for brackets to output data, making coding faster, cleaner, and less confusing than Python or JavaScript.</p>
+        </div>
+        
+        <div class="docs-section">
+            <h3 class="docs-h3">2. Output Syntax (bik)</h3>
+            <p>Use the <strong style="color:#C805F5;">bik</strong> keyword to print text or math. Spaces and brackets like <code>()</code>, <code>{}</code>, or <code>[]</code> are highly flexible and optional!</p>
+            <div class="code-box">
+                <span class="p">bik</span> <span class="s">"Hello World"</span><br>
+                <span class="p">bik</span>(<span class="s">"Hello World"</span>)<br>
+                <span class="p">bik</span> (<span class="s">"Hello World"</span>) <span style="color: #323D55; font-style: italic;">// Space allowed!</span><br>
+                <span class="p">bik</span> 10 + 5 * 2
+            </div>
+        </div>
+        
+        <div class="docs-section">
+            <h3 class="docs-h3">3. Comments</h3>
+            <p>Use comments to write notes in your code. The engine will ignore them.</p>
+            <div class="code-box" style="color: #323D55; font-style: italic;">
+                // Single line comment<br>
+                # Another single line comment<br><br>
+                """<br>Multi-line comment<br>"""
+            </div>
+        </div>
+        
+        <div class="docs-section">
+            <h3 class="docs-h3">4. Variables, Booleans & Arrays (mi)</h3>
+            <p>Use the <strong style="color:#CFAD03;">mi</strong> keyword to create variables. <strong>A semicolon (;) at the end is strictly required!</strong> You can perform math directly inside variables, store Arrays (Lists), and use <strong style="color:#F67500">true / false</strong> logic.</p>
+            <div class="code-box">
+                <span class="mi-kw">mi</span> x = 90;<br>
+                <span class="mi-kw">mi</span> y = 80;<br>
+                <span class="mi-kw">mi</span> isReady = <span class="bool-kw">true</span>;<br>
+                <span class="mi-kw">mi</span> arr = [1, 2.5, <span class="s">"hello"</span>, 4];<br>
+                <span class="p">bik</span> (arr)
+            </div>
+        </div>
+
+        <div class="docs-section">
+            <h3 class="docs-h3">5. Conditions (if / else)</h3>
+            <p>You can execute code conditionally using <strong style="color:#CFAD03">if / else:</strong> based entirely on Python-like indentation.</p>
+            <div class="code-box">
+                <span class="mi-kw">mi</span> x = 7;<br>
+                <span class="mi-kw">mi</span> y = 8;<br><br>
+                <span class="if-kw">if</span> x > y:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="p">bik</span> <span class="s">"hello"</span><br>
+                <span class="if-kw">else:</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="p">bik</span> <span class="s">"not miss"</span>
+            </div>
+        </div>
+        
+        <div class="docs-section">
+            <h3 class="docs-h3">6. Data Types</h3>
+            <p>DearScript supports multiple data types effortlessly:</p>
+            <ul>
+                <li><strong>str:</strong> Text inside quotes, e.g., <code>"Hello"</code></li>
+                <li><strong>int:</strong> Whole numbers, e.g., <code>90</code></li>
+                <li><strong>float:</strong> Decimal numbers, e.g., <code>99.5</code></li>
+                <li><strong>array:</strong> Lists of mixed data, e.g., <code>[1, "hello", 3.5]</code></li>
+                <li><strong>boolean:</strong> Logical states, e.g., <code>true</code> or <code>false</code></li>
+            </ul>
+        </div>
+        
+        <div class="docs-section">
+            <h3 class="docs-h3">7. Data Type Checkers</h3>
+            <p>You can check the type of any variable using <code>dety()</code> or <code>type()</code> directly inside the bik command.</p>
+            <div class="code-box">
+                <span class="mi-kw">mi</span> x = 90;<br>
+                <span class="p">bik</span> (<span class="type-kw">dety</span>(x)) <span style="color: #323D55; font-style: italic;">// Output: integer</span><br>
+                <span class="p">bik</span> (<span class="type-kw">type</span>(x)) <span style="color: #323D55; font-style: italic;">// Output: class: int</span>
+            </div>
+        </div>
+        
+        <div class="docs-section">
+            <h3 class="docs-h3">8. File System & Compilation</h3>
+            <p>DearScript comes with its own Virtual OS. You can save, open, and compile files from the terminal or the new File Manager.</p>
+            <ul>
+                <li><code>ls</code> - View saved files</li>
+                <li><code>ds filename.ds</code> - Execute a saved file</li>
+                <li><code>ds filename.ds convert js</code> - Compiles to JS and prompts download!</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="history-modal" class="modal-bg">
+        <div class="docs-header">
+            <div class="docs-title-container">
+                <div class="docs-title">DearScript</div>
+                <div class="docs-title" style="color:white; font-size: 18px;">Update History</div>
+            </div>
+            <button class="close-docs" onclick="closeModal('history-modal')">CLOSE</button>
+        </div>
+
+        <div class="docs-section">
+            <span class="history-version">0.0.15 beta (THE UX & LINTER UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Error Linter:</strong> Real-time syntax checker added. Forgetting a <code>;</code> or <code>:</code> now shows a red <code>(!)</code> in the editor margin!</li>
+                <li><strong>Premium Autocomplete:</strong> Fully customized the autocomplete dropdown to match the Dracula Dark theme. Fixed green highlight bug.</li>
+                <li><strong>Empty Default & Auto-Save:</strong> The editor now loads empty by default, and continuously Auto-Saves your progress even if you exit the app.</li>
+                <li><strong>File Manager:</strong> Added a dedicated File Manager UI (under 3-dots) to handle creating folders, new files, and saving easily.</li>
+                <li><strong>Native Device Download:</strong> Hitting Download or converting via terminal natively triggers your mobile's File Manager download prompt.</li>
+            </ul>
+
+            <span class="history-version">0.0.14 beta (LOGIC & PERFORMANCE UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Regex Caching (Speed Boost):</strong> Drastically improved engine speed by caching RegExp objects, removing heavy memory loops.</li>
+                <li><strong>Boolean Expressions in Variables:</strong> Math regex now supports logical operators (<code>&gt;, &lt;, ==, !=, &amp;, |</code>), allowing variables to store boolean logic (e.g. <code>mi res = 5 &gt; 3;</code>).</li>
+                <li><strong>If Condition Array Bug:</strong> Fixed logical bug where arrays inside an <code>if</code> statement evaluated incorrectly.</li>
+                <li><strong>Strict Skip/Else Logic:</strong> Hardened the indentation parser so blank lines or misplaced tabs don't falsely trigger an "Else Without If" crash.</li>
+            </ul>
+
+            <span class="history-version">0.0.13 beta (CONDITIONS & BOOLEANS UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Logic & Conditions:</strong> Introduced <code>if</code> and <code>else:</code> condition blocks with Python-style indentation tracking.</li>
+                <li><strong>Booleans:</strong> Native support for <code>true</code> and <code>false</code> data types added to variables and conditions.</li>
+                <li><strong>Expanded Reserved Keywords:</strong> Blocked variable names for <code>intezar</code>, <code>str</code>, <code>floot</code>, <code>Boolean</code>, <code>bool</code> to prevent system clashes.</li>
+                <li><strong>Dynamic Autocomplete:</strong> Fully updated the dropdown suggestions to include all new syntax features and keywords.</li>
+                <li><strong>Color System:</strong> <code>if/else</code> highlighted in Gold, <code>true/false</code> highlighted in Orange, and new reserved words in Blue.</li>
+            </ul>
+
+            <span class="history-version">0.0.12 beta (THE PERFORMANCE & BUGFIX UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Safe String Logic:</strong> Variables matching words inside strings (e.g., <code>"hello"</code>) will no longer be incorrectly replaced by their values.</li>
+                <li><strong>Smart Array Quotes:</strong> Fixed the <code>JSON.parse</code> issue where strings with apostrophes (like <code>"Don't"</code>) would crash the array.</li>
+                <li><strong>VFS Overwrite Protection:</strong> Added a safe prompt when saving a file that already exists to prevent accidental code loss.</li>
+                <li><strong>Compiler IIFE Wrap:</strong> Compiled JS code is now safely wrapped in an IIFE <code>(() => {})();</code> to prevent variable redeclaration conflicts in the browser.</li>
+                <li><strong>Ultra-Fast Comment Parser:</strong> Replaced the slow character-by-character loop with a native robust Regex, making the parser exponentially faster for large codebases.</li>
+            </ul>
+
+            <span class="history-version">0.0.11 beta (SYNTAX & AUTOCOMPLETE UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Syntax Highlighting:</strong> Reserved keywords (<code>float</code>, <code>string</code>, <code>list</code>, <code>array</code>) now highlight in custom Blue (#5980F0).</li>
+                <li><strong>Editor Autocomplete:</strong> Added all reserved keywords to the auto-suggestion dropdown menu.</li>
+            </ul>
+
+            <span class="history-version">0.0.10 beta (ARRAY & KEYWORD UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Mixed Arrays:</strong> Fixed array parser to safely allow strings, integers, and floats together.</li>
+                <li><strong>Reserved Keywords Added:</strong> Added <code>float</code>, <code>string</code>, <code>list</code>, and <code>array</code> to the reserved list.</li>
+            </ul>
+
+            <span class="history-version">0.0.9 beta (THE SAFE ENGINE UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Security:</strong> Removed unsafe <code>eval()</code>. DearScript is now 100% immune to JS injection.</li>
+                <li><strong>Strict Array Parser:</strong> Arrays are now safely parsed using JSON, blocking unauthorized code execution.</li>
+                <li><strong>Bracket Fixes:</strong> Resolved nested bracket bugs using recursive stripping.</li>
+                <li><strong>Empty Output Fix:</strong> Empty <code>bik()</code> now correctly prints a blank line instead of throwing an error.</li>
+                <li><strong>CLI Fix:</strong> HTML characters like <code>&lt;123&gt;</code> are now safely rendered in the terminal.</li>
+            </ul>
+
+            <span class="history-version">0.0.8 beta:</span>
+            <ul class="history-list">
+                <li>Added Compiler! Use <code>convert js</code> or <code>convert js dom</code> to export to JavaScript.</li>
+                <li>Files now automatically prompt to download as <code>.js</code>.</li>
+            </ul>
+
+            <span class="history-version">0.0.7 beta (MASSIVE UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Arrays Added:</strong> Store lists of data like <code>mi x = [1, 2, "a"];</code></li>
+                <li><strong>Terminal & File System:</strong> Introduced a fully working Virtual Terminal.</li>
+            </ul>
+
+            <span class="history-version">0.0.6 beta:</span>
+            <ul class="history-list">
+                <li>Fixed variable assignment math logic.</li>
+                <li>Added support for optional <code>()</code>, <code>{}</code>, and <code>[]</code> brackets.</li>
+            </ul>
+
+            <span class="history-version">0.0.5 beta:</span>
+            <ul class="history-list">
+                <li>Added a clean 3-dot (⋮) menu dropdown in the top bar.</li>
+                <li>Separated Documentation and Update History.</li>
+            </ul>
+            
+            <span class="history-version">0.0.4 beta:</span>
+            <ul class="history-list">
+                <li>Changed <code>mi</code> keyword color to Gold.</li>
+                <li>Added support for mathematical calculations.</li>
+            </ul>
+            
+            <span class="history-version">0.0.3 beta:</span>
+            <ul class="history-list">
+                <li>Added variables (<code>mi</code> keyword) and new syntax.</li>
+            </ul>
+            
+            <span class="history-version">0.0.2 beta:</span>
+            <ul class="history-list">
+                <li>Fixed escaped quotes and autocomplete bugs.</li>
+            </ul>
+            
+            <span class="history-version">0.0.1 beta:</span>
+            <ul class="history-list">
+                <li>Introduced strict error handling engine.</li>
+            </ul>
+            
+            <span class="history-version">0.0.0 beta:</span>
+            <ul class="history-list">
+                <li>Initial release of DearScript.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.15.0/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.15.0/theme-dracula.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.15.0/ext-language_tools.min.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
