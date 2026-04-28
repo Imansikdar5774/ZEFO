@@ -23,7 +23,7 @@ function closeModal(id) {
     document.getElementById(id).style.display = 'none'; 
 }
 
-// --- VIRTUAL FILE SYSTEM LOGIC (0.0.16 FILE MANAGER) ---
+// --- VIRTUAL FILE SYSTEM LOGIC (0.0.17 FILE MANAGER) ---
 let vfs = JSON.parse(localStorage.getItem('ds_vfs')) || {};
 
 function openFileManager() {
@@ -126,7 +126,7 @@ function downloadJSFile(filename, content) {
 
 // --- COMPILER (DEARSCRIPT TO JAVASCRIPT) ---
 function convertToJS(code, isDom) {
-    let jsCode = "// Compiled from DearScript v0.0.16\n(() => {\n";
+    let jsCode = "// Compiled from DearScript v0.0.17\n(() => {\n";
     let rawCode = code.replace(/'''([\s\S]*?)'''/g, '/*$1*/').replace(/"""([\s\S]*?)"""/g, '/*$1*/');
     const lines = rawCode.split("\n");
     let indentStack = [];
@@ -154,11 +154,13 @@ function convertToJS(code, isDom) {
         } else if (clean === "else:") {
             if (indentStack.length > 0) { jsCode += "    ".repeat(indentStack.length) + "} else {\n"; } 
             else { jsCode += "    } else {\n"; }
+        } else if (clean.match(/^[a-zA-Z_]\w*\.dech\s*=\s*\w+;?$/)) { // NEW DECH COMPILER LOGIC
+            jsCode += "    ".repeat(indentStack.length + 1) + "// " + clean + " (Type spoofing handled in DearScript Engine)\n";
         } else if (clean.startsWith("mi ")) {
             let eqIdx = clean.indexOf('=');
             if (eqIdx !== -1) { lastVar = clean.substring(3, eqIdx).trim(); } // Store last var name
             jsCode += "    ".repeat(indentStack.length + 1) + clean.replace(/^mi\s+/, "let ") + "\n";
-        } else if (clean.startsWith("not ") || clean.startsWith("not=")) { // NEW NOT COMPILER LOGIC
+        } else if (clean.startsWith("not ") || clean.startsWith("not=")) { 
             let cleanNot = clean.substring(3).trim();
             let isSemi = cleanNot.endsWith(";");
             let core = isSemi ? cleanNot.slice(0, -1) : cleanNot;
@@ -258,10 +260,10 @@ ace.define('ace/mode/ds_highlight_rules', function(require, exports, module) {
                 { token: "comment", regex: '"""', next: "qqstring" },
                 { token: "comment", regex: "'''", next: "qstring" },
                 { token: "keyword.bik", regex: "\\bbik\\b" }, 
-                { token: "keyword.mi", regex: "\\b(?:mi|not)\\b" }, // UPDATED: ADDED 'not'
+                { token: "keyword.mi", regex: "\\b(?:mi|not)\\b" }, 
                 { token: "keyword.ifelse", regex: "\\b(?:if|else)\\b" }, 
                 { token: "constant.boolean", regex: "\\b(?:true|false)\\b" }, 
-                { token: "keyword.detytype", regex: "\\b(?:type|dety)\\b" },
+                { token: "keyword.detytype", regex: "\\b(?:type|dety|dech)\\b" }, // UPDATED: ADDED 'dech'
                 { token: "keyword.reserved", regex: "\\b(?:float|string|list|array|intezar|str|floot|Boolean|bool)\\b" }, 
                 { token: "string", regex: '"(?:[^"\\\\]|\\\\.)*"' }, 
                 { token: "constant.numeric", regex: "[0-9]+" }
@@ -318,7 +320,8 @@ langTools.addCompleter({
         callback(null, [ 
             {name:"bik", value:"bik", score:1000, meta: "Print"}, 
             {name:"mi", value:"mi", score:1000, meta: "Variable"},
-            {name:"not", value:"not", score:1000, meta: "Reassign"}, // UPDATED: ADDED 'not'
+            {name:"not", value:"not", score:1000, meta: "Reassign"}, 
+            {name:"dech", value:"dech", score:1000, meta: "TypeCast"}, // UPDATED: ADDED 'dech'
             {name:"if", value:"if", score:1000, meta: "Condition"},
             {name:"else:", value:"else:", score:1000, meta: "Condition"},
             {name:"true", value:"true", score:1000, meta: "Boolean"},
@@ -355,9 +358,13 @@ editor.session.on('change', function() {
         if (clean.startsWith('if ') && !clean.endsWith(':')) {
             annotations.push({ row: i, column: 0, text: "Syntax Error: missing ':' at the end of 'if' condition.", type: "error" });
         }
-        // Check missing semi-colon for not (NEW LINTER RULE)
+        // Check missing semi-colon for not
         if ((clean.startsWith('not ') || clean.startsWith('not=')) && !clean.endsWith(';')) {
             annotations.push({ row: i, column: 0, text: "Syntax Error: missing (;) at the end of 'not' statement.", type: "error" });
+        }
+        // Check missing semi-colon for .dech (NEW LINTER RULE)
+        if (clean.match(/^[a-zA-Z_]\w*\.dech\s*=/) && !clean.endsWith(';')) {
+            annotations.push({ row: i, column: 0, text: "Syntax Error: missing (;) at the end of .dech statement.", type: "error" });
         }
     });
     editor.session.setAnnotations(annotations); // Shows red (!) in editor margin
@@ -372,19 +379,20 @@ function removeInlineComments(text) {
     return text.replace(/(".*?"|'.*?')|(\/\/.*|#.*)/g, (match, stringLiteral) => stringLiteral ? stringLiteral : "").trimEnd();
 }
 
-// --- THE MASTER DEARSCRIPT ENGINE v0.0.16 ---
+// --- THE MASTER DEARSCRIPT ENGINE v0.0.17 ---
 function engineExecute(code) {
     let rawCode = code.replace(/"""[\s\S]*?"""/g, '').replace(/'''[\s\S]*?'''/g, '');
     const lines = rawCode.split("\n");
     let output = ""; 
     let memory = {};
-    const reservedKw = ["bik", "mi", "not", "dety", "type", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "if", "else", "true", "false"];
+    let typeOverrides = {}; // NEW: TRACKS SPOOFED DATA TYPES
+    const reservedKw = ["bik", "mi", "not", "dety", "type", "dech", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "if", "else", "true", "false"];
     
     let skipMode = false;
     let baseIndent = 0;
     let lastIfResult = false;
     let hasActiveIf = false;
-    let lastVar = null; // NEW: TRACKS THE LAST DECLARED VARIABLE FOR ANONYMOUS 'NOT'
+    let lastVar = null; 
 
     let regexCache = {};
 
@@ -403,6 +411,19 @@ function engineExecute(code) {
 
         if (skipMode && indent > baseIndent) {
             continue; 
+        }
+
+        // --- NEW '.dech' TYPE SPOOFING LOGIC ---
+        let dechMatch = clean.match(/^([a-zA-Z_]\w*)\.dech\s*=\s*([a-zA-Z_]\w*);?$/);
+        if (dechMatch) {
+            let varName = dechMatch[1];
+            let newType = dechMatch[2];
+            if (memory.hasOwnProperty(varName)) {
+                typeOverrides[varName] = newType; // Overrides the reported type!
+            } else {
+                output += `<span class="error-text">Reference Error: '${varName}' not defined.</span>\n`;
+            }
+            continue;
         }
         
         if (clean.startsWith("if ") && clean.endsWith(":")) {
@@ -438,7 +459,6 @@ function engineExecute(code) {
             continue;
         }
 
-        // --- NEW 'NOT' KEYWORD LOGIC BLOCK ---
         if (clean.startsWith("not ") || clean.startsWith("not=")) {
             if (!clean.endsWith(";")) { 
                 output += `<span class="error-text">Syntax Error: missing (;) at the end of 'not' statement.</span>\n`; 
@@ -456,7 +476,6 @@ function engineExecute(code) {
             let varName = assignment.substring(0, eqIndex).trim();
             let varValue = assignment.substring(eqIndex + 1).trim();
             
-            // SMART DETECT: If no name given, use the last declared variable!
             let targetVar = (varName === "") ? lastVar : varName;
 
             if (!targetVar) {
@@ -473,7 +492,6 @@ function engineExecute(code) {
                 continue;
             }
 
-            // Value Parsing (Same powerful logic as 'mi')
             if (varValue.startsWith('"') && varValue.endsWith('"')) {
                 memory[targetVar] = varValue.slice(1, -1).replace(/\\"/g, '"'); 
             } 
@@ -509,7 +527,7 @@ function engineExecute(code) {
                     output += `<span class="error-text">Syntax Error: unsupported value in 'not'</span>\n`; 
                 }
             }
-            lastVar = targetVar; // Update last accessed variable
+            lastVar = targetVar; 
             continue; 
         }
 
@@ -574,7 +592,7 @@ function engineExecute(code) {
                     output += `<span class="error-text">Syntax Error: unsupported value for '${varName}'</span>\n`; 
                 }
             }
-            lastVar = varName; // TRACK VARIABLE FOR FUTURE ANONYMOUS 'NOT'
+            lastVar = varName; 
             continue; 
         }
         
@@ -593,28 +611,38 @@ function engineExecute(code) {
             let detyMatch = val.match(/^dety\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("dety ") ? [null, val.replace(/^dety\s*/, "")] : null);
             let typeMatch = val.match(/^type\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("type ") ? [null, val.replace(/^type\s*/, "")] : null);
 
+            // UPDATED 'DETY' LOGIC (Checks typeOverrides first)
             if (detyMatch) {
                 let varNameToCheck = detyMatch[1].trim();
                 if (memory.hasOwnProperty(varNameToCheck)) {
+                    let baseType = "";
                     let memVal = memory[varNameToCheck];
-                    if (Array.isArray(memVal)) output += "array\n";
-                    else if (typeof memVal === 'boolean') output += "boolean\n";
-                    else if (typeof memVal === 'number' && memVal % 1 === 0) output += "integer\n";
-                    else if (typeof memVal === 'number' && memVal % 1 !== 0) output += "float\n";
-                    else if (typeof memVal === 'string') output += "string\n";
+                    if (Array.isArray(memVal)) baseType = "list";
+                    else if (typeof memVal === 'boolean') baseType = "bool";
+                    else if (typeof memVal === 'number' && memVal % 1 === 0) baseType = "int"; // "int" as requested
+                    else if (typeof memVal === 'number' && memVal % 1 !== 0) baseType = "float";
+                    else if (typeof memVal === 'string') baseType = "str";
+
+                    let finalType = typeOverrides[varNameToCheck] || baseType;
+                    output += finalType + "\n";
                 } else { output += `<span class="error-text">Reference Error: '${varNameToCheck}' not defined.</span>\n`; }
                 continue;
             }
 
+            // UPDATED 'TYPE' LOGIC (Outputs <class int> format and checks typeOverrides)
             if (typeMatch) {
                 let varNameToCheck = typeMatch[1].trim();
                 if (memory.hasOwnProperty(varNameToCheck)) {
+                    let baseType = "";
                     let memVal = memory[varNameToCheck];
-                    if (Array.isArray(memVal)) output += "class: list\n";
-                    else if (typeof memVal === 'boolean') output += "class: bool\n";
-                    else if (typeof memVal === 'number' && memVal % 1 === 0) output += "class: int\n";
-                    else if (typeof memVal === 'number' && memVal % 1 !== 0) output += "class: float\n";
-                    else if (typeof memVal === 'string') output += "class: str\n";
+                    if (Array.isArray(memVal)) baseType = "list";
+                    else if (typeof memVal === 'boolean') baseType = "bool";
+                    else if (typeof memVal === 'number' && memVal % 1 === 0) baseType = "int";
+                    else if (typeof memVal === 'number' && memVal % 1 !== 0) baseType = "float";
+                    else if (typeof memVal === 'string') baseType = "str";
+
+                    let finalType = typeOverrides[varNameToCheck] || baseType;
+                    output += escapeHTML("<class " + finalType + ">") + "\n"; // Escapes tags perfectly for HTML view
                 } else { output += `<span class="error-text">Reference Error: '${varNameToCheck}' not defined.</span>\n`; }
                 continue;
             }
