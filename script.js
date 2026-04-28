@@ -23,7 +23,7 @@ function closeModal(id) {
     document.getElementById(id).style.display = 'none'; 
 }
 
-// --- VIRTUAL FILE SYSTEM LOGIC (0.0.15 FILE MANAGER) ---
+// --- VIRTUAL FILE SYSTEM LOGIC (0.0.16 FILE MANAGER) ---
 let vfs = JSON.parse(localStorage.getItem('ds_vfs')) || {};
 
 function openFileManager() {
@@ -126,10 +126,11 @@ function downloadJSFile(filename, content) {
 
 // --- COMPILER (DEARSCRIPT TO JAVASCRIPT) ---
 function convertToJS(code, isDom) {
-    let jsCode = "// Compiled from DearScript v0.0.15\n(() => {\n";
+    let jsCode = "// Compiled from DearScript v0.0.16\n(() => {\n";
     let rawCode = code.replace(/'''([\s\S]*?)'''/g, '/*$1*/').replace(/"""([\s\S]*?)"""/g, '/*$1*/');
     const lines = rawCode.split("\n");
     let indentStack = [];
+    let lastVar = null; // Compiler track last var
     
     lines.forEach(l => {
         let clean = l.trim();
@@ -154,7 +155,21 @@ function convertToJS(code, isDom) {
             if (indentStack.length > 0) { jsCode += "    ".repeat(indentStack.length) + "} else {\n"; } 
             else { jsCode += "    } else {\n"; }
         } else if (clean.startsWith("mi ")) {
+            let eqIdx = clean.indexOf('=');
+            if (eqIdx !== -1) { lastVar = clean.substring(3, eqIdx).trim(); } // Store last var name
             jsCode += "    ".repeat(indentStack.length + 1) + clean.replace(/^mi\s+/, "let ") + "\n";
+        } else if (clean.startsWith("not ") || clean.startsWith("not=")) { // NEW NOT COMPILER LOGIC
+            let cleanNot = clean.substring(3).trim();
+            let isSemi = cleanNot.endsWith(";");
+            let core = isSemi ? cleanNot.slice(0, -1) : cleanNot;
+            let eqIdx = core.indexOf('=');
+            if(eqIdx !== -1) {
+                let vName = core.substring(0, eqIdx).trim();
+                let vVal = core.substring(eqIdx + 1).trim();
+                let target = vName === "" ? lastVar : vName;
+                jsCode += "    ".repeat(indentStack.length + 1) + target + " = " + vVal + (isSemi ? ";" : "") + "\n";
+                lastVar = target;
+            }
         } else if (clean.match(/^bik[\s\(\{\[]/)) {
             let val = clean.replace(/^bik/, "").trim();
             while ((val.startsWith("(") && val.endsWith(")")) || (val.startsWith("[") && val.endsWith("]")) || (val.startsWith("{") && val.endsWith("}"))) {
@@ -243,7 +258,7 @@ ace.define('ace/mode/ds_highlight_rules', function(require, exports, module) {
                 { token: "comment", regex: '"""', next: "qqstring" },
                 { token: "comment", regex: "'''", next: "qstring" },
                 { token: "keyword.bik", regex: "\\bbik\\b" }, 
-                { token: "keyword.mi", regex: "\\bmi\\b" }, 
+                { token: "keyword.mi", regex: "\\b(?:mi|not)\\b" }, // UPDATED: ADDED 'not'
                 { token: "keyword.ifelse", regex: "\\b(?:if|else)\\b" }, 
                 { token: "constant.boolean", regex: "\\b(?:true|false)\\b" }, 
                 { token: "keyword.detytype", regex: "\\b(?:type|dety)\\b" },
@@ -303,6 +318,7 @@ langTools.addCompleter({
         callback(null, [ 
             {name:"bik", value:"bik", score:1000, meta: "Print"}, 
             {name:"mi", value:"mi", score:1000, meta: "Variable"},
+            {name:"not", value:"not", score:1000, meta: "Reassign"}, // UPDATED: ADDED 'not'
             {name:"if", value:"if", score:1000, meta: "Condition"},
             {name:"else:", value:"else:", score:1000, meta: "Condition"},
             {name:"true", value:"true", score:1000, meta: "Boolean"},
@@ -339,6 +355,10 @@ editor.session.on('change', function() {
         if (clean.startsWith('if ') && !clean.endsWith(':')) {
             annotations.push({ row: i, column: 0, text: "Syntax Error: missing ':' at the end of 'if' condition.", type: "error" });
         }
+        // Check missing semi-colon for not (NEW LINTER RULE)
+        if ((clean.startsWith('not ') || clean.startsWith('not=')) && !clean.endsWith(';')) {
+            annotations.push({ row: i, column: 0, text: "Syntax Error: missing (;) at the end of 'not' statement.", type: "error" });
+        }
     });
     editor.session.setAnnotations(annotations); // Shows red (!) in editor margin
 });
@@ -352,18 +372,19 @@ function removeInlineComments(text) {
     return text.replace(/(".*?"|'.*?')|(\/\/.*|#.*)/g, (match, stringLiteral) => stringLiteral ? stringLiteral : "").trimEnd();
 }
 
-// --- THE MASTER DEARSCRIPT ENGINE v0.0.15 ---
+// --- THE MASTER DEARSCRIPT ENGINE v0.0.16 ---
 function engineExecute(code) {
     let rawCode = code.replace(/"""[\s\S]*?"""/g, '').replace(/'''[\s\S]*?'''/g, '');
     const lines = rawCode.split("\n");
     let output = ""; 
     let memory = {};
-    const reservedKw = ["bik", "mi", "dety", "type", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "if", "else", "true", "false"];
+    const reservedKw = ["bik", "mi", "not", "dety", "type", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "if", "else", "true", "false"];
     
     let skipMode = false;
     let baseIndent = 0;
     let lastIfResult = false;
     let hasActiveIf = false;
+    let lastVar = null; // NEW: TRACKS THE LAST DECLARED VARIABLE FOR ANONYMOUS 'NOT'
 
     let regexCache = {};
 
@@ -415,6 +436,81 @@ function engineExecute(code) {
             hasActiveIf = false;
             skipMode = lastIfResult; 
             continue;
+        }
+
+        // --- NEW 'NOT' KEYWORD LOGIC BLOCK ---
+        if (clean.startsWith("not ") || clean.startsWith("not=")) {
+            if (!clean.endsWith(";")) { 
+                output += `<span class="error-text">Syntax Error: missing (;) at the end of 'not' statement.</span>\n`; 
+                continue; 
+            }
+            
+            let assignment = clean.substring(3, clean.length - 1).trim(); 
+            let eqIndex = assignment.indexOf('=');
+            
+            if (eqIndex === -1) { 
+                output += `<span class="error-text">Syntax Error: missing '=' in 'not' declaration.</span>\n`; 
+                continue; 
+            }
+            
+            let varName = assignment.substring(0, eqIndex).trim();
+            let varValue = assignment.substring(eqIndex + 1).trim();
+            
+            // SMART DETECT: If no name given, use the last declared variable!
+            let targetVar = (varName === "") ? lastVar : varName;
+
+            if (!targetVar) {
+                output += `<span class="error-text">Error: No previous variable found to update for anonymous 'not'.</span>\n`;
+                continue;
+            }
+            
+            if (varName !== "" && !/^[a-zA-Z_]\w*$/.test(varName)) { 
+                output += `<span class="error-text">Syntax Error: invalid variable name '${varName}'</span>\n`; 
+                continue; 
+            }
+            if (varName !== "" && reservedKw.includes(varName)) {
+                output += `<span class="error-text">Syntax Error: '${varName}' is a reserved keyword.</span>\n`;
+                continue;
+            }
+
+            // Value Parsing (Same powerful logic as 'mi')
+            if (varValue.startsWith('"') && varValue.endsWith('"')) {
+                memory[targetVar] = varValue.slice(1, -1).replace(/\\"/g, '"'); 
+            } 
+            else if (varValue === "true" || varValue === "false") {
+                memory[targetVar] = (varValue === "true");
+            }
+            else if (varValue.startsWith('[') && varValue.endsWith(']')) {
+                try { 
+                    let jsonSafe = varValue.replace(/(?:^|\[|,)\s*'([^'\\]*(?:\\.[^'\\]*)*)'\s*(?=\]|,)/g, function(m, p1) { return m.replace(/'/g, '"'); });
+                    memory[targetVar] = JSON.parse(jsonSafe); 
+                } catch(e) { 
+                    output += `<span class="error-text">Array Syntax Error in 'not'.</span>\n`; 
+                }
+            } 
+            else {
+                let evalString = varValue;
+                let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
+                
+                keys.forEach(k => { 
+                    if (!regexCache[k]) { regexCache[k] = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g'); }
+                    evalString = evalString.replace(regexCache[k], (match, isString) => {
+                        if (isString) return match;
+                        return typeof memory[k] === 'string' ? `"${memory[k]}"` : JSON.stringify(memory[k]);
+                    });
+                });
+                
+                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%]+$/.test(evalString) && evalString !== "") {
+                    try { memory[targetVar] = new Function('return ' + evalString)(); } 
+                    catch (e) { output += `<span class="error-text">Math/Logic Error in 'not' variable '${targetVar}'</span>\n`; }
+                } else if (/^".*"$/.test(evalString)) {
+                    memory[targetVar] = evalString.slice(1, -1);
+                } else { 
+                    output += `<span class="error-text">Syntax Error: unsupported value in 'not'</span>\n`; 
+                }
+            }
+            lastVar = targetVar; // Update last accessed variable
+            continue; 
         }
 
         if (clean.startsWith("mi ")) {
@@ -469,7 +565,6 @@ function engineExecute(code) {
                     });
                 });
                 
-                // UPDATED REGEX: Added \% to allow Modulo/Remainder operator
                 if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%]+$/.test(evalString) && evalString !== "") {
                     try { memory[varName] = new Function('return ' + evalString)(); } 
                     catch (e) { output += `<span class="error-text">Math/Logic Error in variable '${varName}'</span>\n`; }
@@ -479,6 +574,7 @@ function engineExecute(code) {
                     output += `<span class="error-text">Syntax Error: unsupported value for '${varName}'</span>\n`; 
                 }
             }
+            lastVar = varName; // TRACK VARIABLE FOR FUTURE ANONYMOUS 'NOT'
             continue; 
         }
         
@@ -555,9 +651,7 @@ function engineExecute(code) {
                     continue;
                 }
 
-                // UPDATED REGEX: Added \% to allow Modulo/Remainder operator
                 if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%]+$/.test(evalString) && evalString !== "") {
-                    // UPDATED ERROR CHECK: Allow valid modulo calculations
                     if (/[\+\-\*\/\%]{2,}/.test(evalString.replace(/\s+/g,''))) { output += `<span class="error-text">Math Error</span>\n`; } 
                     else { 
                         try { output += new Function('return ' + evalString)() + "\n"; } 
