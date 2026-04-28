@@ -264,11 +264,22 @@ ace.define('ace/mode/dearscript', function(require, exports, module) {
     var TextMode = require("ace/mode/text").Mode;
     var dsHighlightRules = require("ace/mode/ds_highlight_rules").dsHighlightRules;
     var CstyleBehaviour = require("ace/mode/behaviour/cstyle").CstyleBehaviour;
+    
     var Mode = function() { 
         this.HighlightRules = dsHighlightRules; 
         this.$behaviour = new CstyleBehaviour(); 
     };
     oop.inherits(Mode, TextMode); 
+
+    // --- AUTO-INDENT LOGIC (PYTHON STYLE) ---
+    Mode.prototype.getNextLineIndent = function(state, line, tab) {
+        var indent = this.$getIndent(line);
+        if (line.match(/:[ \t]*$/)) {
+            indent += tab;
+        }
+        return indent;
+    };
+
     exports.Mode = Mode;
 });
 
@@ -283,7 +294,6 @@ editor.setOptions({
 });
 
 // LOAD PERSISTENT AUTO-SAVE OR EMPTY
-// Now it loads completely empty if nothing was auto-saved.
 const savedCode = localStorage.getItem('ds_autosave') || "";
 editor.setValue(savedCode, -1);
 
@@ -459,7 +469,8 @@ function engineExecute(code) {
                     });
                 });
                 
-                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|]+$/.test(evalString) && evalString !== "") {
+                // UPDATED REGEX: Added \% to allow Modulo/Remainder operator
+                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%]+$/.test(evalString) && evalString !== "") {
                     try { memory[varName] = new Function('return ' + evalString)(); } 
                     catch (e) { output += `<span class="error-text">Math/Logic Error in variable '${varName}'</span>\n`; }
                 } else if (/^".*"$/.test(evalString)) {
@@ -544,8 +555,10 @@ function engineExecute(code) {
                     continue;
                 }
 
-                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|]+$/.test(evalString) && evalString !== "") {
-                    if (/[\+\-\*\/]{2,}/.test(evalString.replace(/\s+/g,''))) { output += `<span class="error-text">Math Error</span>\n`; } 
+                // UPDATED REGEX: Added \% to allow Modulo/Remainder operator
+                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%]+$/.test(evalString) && evalString !== "") {
+                    // UPDATED ERROR CHECK: Allow valid modulo calculations
+                    if (/[\+\-\*\/\%]{2,}/.test(evalString.replace(/\s+/g,''))) { output += `<span class="error-text">Math Error</span>\n`; } 
                     else { 
                         try { output += new Function('return ' + evalString)() + "\n"; } 
                         catch (e) { output += `<span class="error-text">Math/Logic Error</span>\n`; } 
