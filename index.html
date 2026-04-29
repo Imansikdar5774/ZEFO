@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DearScript Official IDE - 0.0.19 Beta</title>
+    <title>DearScript Official IDE - 0.0.20 Beta</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -49,7 +49,7 @@
 
     <div id="cli-modal">
         <div class="cli-header">
-            <span style="color:#C805F5; font-weight:bold;">DearScript OS Terminal v0.0.19</span>
+            <span style="color:#C805F5; font-weight:bold;">DearScript OS Terminal v0.0.20</span>
             <button onclick="document.getElementById('cli-modal').style.display='none'" style="background:#ff5555; color:white; border:none; padding:5px 10px; cursor:pointer; font-weight:bold;">EXIT</button>
         </div>
         <div id="cli-output">Welcome to DearScript OS. File system initialized.<br>Type 'ls' to see files. Type 'ds filename.ds' to run.<br>Compile to JS using 'ds filename.ds convert js'</div>
@@ -137,7 +137,7 @@
                 <span class="mi-kw">mi</span> x = 90;<br>
                 x.dech = string;<br>
                 <span class="p">bik</span> (<span class="type-kw">dety</span>(x)) <span style="color: #323D55; font-style: italic;">// Output: string</span><br>
-                <span class="p">bik</span> (<span class="type-kw">type</span>(x)) <span style="color: #323D55; font-style: italic;">// Output: class: str</span>
+                <span class="p">bik</span> (<span class="type-kw">type</span>(x)) <span style="color: #323D55; font-style: italic;">// Output: &lt;class 'str'&gt;</span>
             </div>
         </div>
         
@@ -162,6 +162,15 @@
         </div>
 
         <div class="docs-section">
+            <span class="history-version">0.0.20 beta (THE PERFORMANCE & STRING UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Execution Speedometer:</strong> Added real-time execution speed tracking (e.g. <code>[execute success, 5ms]</code>).</li>
+                <li><strong>Engine Optimization:</strong> Major engine refactor with globally cached Regex for lightning fast execution.</li>
+                <li><strong>Strict String Operations:</strong> Fixed math operations on strings (e.g., 80 + "50" outputs 8050).</li>
+                <li><strong>Multi-line & Multi-Quote Strings:</strong> Added full support for single quotes (<code>'</code>) and multi-line backticks (<code>`</code>).</li>
+                <li><strong>Type Refinement:</strong> <code>dety()</code> returns full names (intezar, floot, string) and <code>type()</code> matches standard Python output (<code>&lt;class 'int'&gt;</code>).</li>
+            </ul>
+
             <span class="history-version">0.0.19 beta (STABILITY UPDATE):</span>
             <ul class="history-list">
                 <li><strong>History Expansion:</strong> Full version history from 0.0.0 to 0.0.19 beta is now fully integrated.</li>
@@ -170,21 +179,20 @@
 
             <span class="history-version">0.0.18 beta (THE DECH UPDATE):</span>
             <ul class="history-list">
-                <li><strong>Type Spoofing (.dech):</strong> Change the reported data type of any variable without modifying its actual value (e.g. <code>x.dech = int;</code>).</li>
-                <li><code>dety()</code> now returns raw types like <code>int</code>, and <code>type()</code> returns Python format <code>&lt;class int&gt;</code>.</li>
-                <li>Added Teal (#24B7A6) highlighting for <code>dech</code> keyword.</li>
+                <li><strong>Type Spoofing (.dech):</strong> Change the reported data type of any variable without modifying its actual value.</li>
+                <li>Added Teal highlighting for <code>dech</code> keyword.</li>
                 <li>Added <code>int</code> to keywords.</li>
             </ul>
 
             <span class="history-version">0.0.17 beta (VALUE CHANGING UPDATE):</span>
             <ul class="history-list">
-                <li><strong>Anonymous Reassignment:</strong> Introduced the <code>not</code> keyword. Allows updating the last created variable's value instantly without typing its name (e.g., <code>not = "new value";</code>).</li>
+                <li><strong>Anonymous Reassignment:</strong> Introduced the <code>not</code> keyword. Allows updating the last created variable's value instantly without typing its name.</li>
                 <li><strong>Named Reassignment:</strong> <code>not a = "value";</code> changes a specific existing variable easily.</li>
             </ul>
 
             <span class="history-version">0.0.16 beta (LOGIC UPDATE):</span>
             <ul class="history-list">
-                <li><strong>Conditionals & Modulo:</strong> Officially implemented <code>==</code> and <code>%</code> operator into the parsing engine for robust logic handling.</li>
+                <li>Officially implemented <code>==</code> and <code>%</code> operator into the parsing engine for robust logic handling.</li>
             </ul>
 
             <span class="history-version">0.0.15 beta (THE UX & LINTER UPDATE):</span>

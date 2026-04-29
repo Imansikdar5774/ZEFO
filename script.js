@@ -94,7 +94,7 @@ function createNewFile() {
         if (vfs[fname] && !confirm("File already exists. Overwrite?")) return;
         vfs[fname] = "";
         localStorage.setItem('ds_vfs', JSON.stringify(vfs));
-        editor.setValue("", -1); // Load empty file into editor
+        editor.setValue("", -1); 
         renderFileList();
         closeModal('fm-modal');
     }
@@ -119,18 +119,19 @@ function downloadJSFile(filename, content) {
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
-    a.click(); // Triggers mobile File Manager download prompt
+    a.click(); 
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
 
-// --- COMPILER (DEARSCRIPT TO JAVASCRIPT) v0.0.19 ---
+// --- COMPILER (DEARSCRIPT TO JAVASCRIPT) ---
 function convertToJS(code, isDom) {
-    let jsCode = "// Compiled from DearScript v0.0.19\n(() => {\n";
+    let jsCode = "// Compiled from DearScript Engine\n(() => {\n";
     let rawCode = code.replace(/'''([\s\S]*?)'''/g, '/*$1*/').replace(/"""([\s\S]*?)"""/g, '/*$1*/');
+    rawCode = rawCode.replace(/`([\s\S]*?)`/g, function(match) { return match.replace(/\n/g, '\\n'); });
     const lines = rawCode.split("\n");
     let indentStack = [];
-    let lastVar = null; // Compiler track last var
+    let lastVar = null; 
     
     lines.forEach(l => {
         let clean = l.trim();
@@ -221,7 +222,7 @@ function handleCLI(e) {
                 if (vfs[fname]) {
                     let jsContent = convertToJS(vfs[fname], isDom);
                     let jsFilename = fname.replace(".ds", ".js");
-                    downloadJSFile(jsFilename, jsContent); // Native Download Trigger
+                    downloadJSFile(jsFilename, jsContent); 
                     printCLI(`Success: Compiled '${fname}' to JavaScript.`);
                     printCLI(`Opening Mobile File Manager to save '${jsFilename}'...`);
                 } else {
@@ -232,7 +233,7 @@ function handleCLI(e) {
                     let result = engineExecute(vfs[fname]);
                     let tempDiv = document.createElement("div");
                     tempDiv.innerHTML = result;
-                    printCLI(escapeHTML(tempDiv.innerText));
+                    printCLI(tempDiv.innerHTML);
                 } else {
                     printCLI(`<span style="color:#ff5555">Error: file '${fname}' not found.</span>`);
                 }
@@ -266,7 +267,7 @@ ace.define('ace/mode/ds_highlight_rules', function(require, exports, module) {
                 { token: "keyword.detytype", regex: "\\b(?:type|dety)\\b" },
                 { token: "keyword.dech", regex: "\\bdech\\b" }, 
                 { token: "keyword.reserved", regex: "\\b(?:float|string|list|array|intezar|str|floot|Boolean|bool|int)\\b" }, 
-                { token: "string", regex: '"(?:[^"\\\\]|\\\\.)*"' }, 
+                { token: "string", regex: '(["\'`])(?:(?=(\\\\?))\\2.)*?\\1' }, 
                 { token: "constant.numeric", regex: "[0-9]+" }
             ],
             "qqstring": [ { token: "comment", regex: '"""', next: "start" }, { defaultToken: "comment" } ],
@@ -289,7 +290,6 @@ ace.define('ace/mode/dearscript', function(require, exports, module) {
     };
     oop.inherits(Mode, TextMode); 
 
-    // --- AUTO-INDENT LOGIC (PYTHON STYLE) ---
     Mode.prototype.getNextLineIndent = function(state, line, tab) {
         var indent = this.$getIndent(line);
         if (line.match(/:[ \t]*$/)) {
@@ -311,7 +311,6 @@ editor.setOptions({
     behavioursEnabled: true 
 });
 
-// LOAD PERSISTENT AUTO-SAVE OR EMPTY
 const savedCode = localStorage.getItem('ds_autosave') || "";
 editor.setValue(savedCode, -1);
 
@@ -343,33 +342,28 @@ langTools.addCompleter({
     } 
 });
 
-// --- REAL-TIME LINTER & AUTO-SAVE ---
 editor.session.on('change', function() {
     let code = editor.getValue();
-    localStorage.setItem('ds_autosave', code); // Auto-save constantly
+    localStorage.setItem('ds_autosave', code);
 
     let annotations = [];
     let lines = code.split('\n');
     lines.forEach((line, i) => {
         let clean = line.trim();
-        // Check missing semi-colon for mi
         if (clean.startsWith('mi ') && !clean.endsWith(';')) {
             annotations.push({ row: i, column: 0, text: "Syntax Error: missing (;) at the end of variable.", type: "error" });
         }
-        // Check missing colon for if
         if (clean.startsWith('if ') && !clean.endsWith(':')) {
             annotations.push({ row: i, column: 0, text: "Syntax Error: missing ':' at the end of 'if' condition.", type: "error" });
         }
-        // Check missing semi-colon for not
         if ((clean.startsWith('not ') || clean.startsWith('not=')) && !clean.endsWith(';')) {
             annotations.push({ row: i, column: 0, text: "Syntax Error: missing (;) at the end of 'not' statement.", type: "error" });
         }
-        // Check missing semi-colon for .dech
         if (clean.match(/^[a-zA-Z_]\w*\.dech\s*=/) && !clean.endsWith(';')) {
             annotations.push({ row: i, column: 0, text: "Syntax Error: missing (;) at the end of .dech statement.", type: "error" });
         }
     });
-    editor.session.setAnnotations(annotations); // Shows red (!) in editor margin
+    editor.session.setAnnotations(annotations);
 });
 
 // --- HELPER FUNCTIONS ---
@@ -378,16 +372,24 @@ function escapeHTML(str) {
 }
 
 function removeInlineComments(text) {
-    return text.replace(/(".*?"|'.*?')|(\/\/.*|#.*)/g, (match, stringLiteral) => stringLiteral ? stringLiteral : "").trimEnd();
+    return text.replace(/(".*?"|'.*?'|`.*?`)|(\/\/.*|#.*)/g, (match, stringLiteral) => stringLiteral ? stringLiteral : "").trimEnd();
 }
 
-// --- THE MASTER DEARSCRIPT ENGINE v0.0.19 ---
+// --- THE MASTER DEARSCRIPT ENGINE ---
 function engineExecute(code) {
+    let startTime = performance.now(); 
+    
     let rawCode = code.replace(/"""[\s\S]*?"""/g, '').replace(/'''[\s\S]*?'''/g, '');
+    
+    // SAFE MULTI-LINE STRING PARSER
+    rawCode = rawCode.replace(/`([\s\S]*?)`/g, function(match) {
+        return match.replace(/\r?\n/g, '\\n');
+    });
+
     const lines = rawCode.split("\n");
     let output = ""; 
     let memory = {};
-    let typeOverrides = {}; // TRACKS SPOOFED DATA TYPES
+    let typeOverrides = {}; 
     const reservedKw = ["bik", "mi", "not", "dety", "type", "dech", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "int", "if", "else", "true", "false"];
     
     let skipMode = false;
@@ -396,7 +398,17 @@ function engineExecute(code) {
     let hasActiveIf = false;
     let lastVar = null; 
 
-    let regexCache = {};
+    // PERFORMANCE CACHING
+    let memoryKeys = [];
+    let memoryRegexes = {};
+    const updateMemoryCache = () => {
+        memoryKeys = Object.keys(memory).sort((a, b) => b.length - a.length);
+        memoryKeys.forEach(k => {
+            if (!memoryRegexes[k]) {
+                memoryRegexes[k] = new RegExp('(".*?"|\'.*?\'|`.*?`)|\\b' + k + '\\b', 'g');
+            }
+        });
+    };
 
     for (let i = 0; i < lines.length; i++) {
         let rawLine = lines[i];
@@ -415,13 +427,12 @@ function engineExecute(code) {
             continue; 
         }
 
-        // --- NEW '.dech' TYPE SPOOFING LOGIC ---
         let dechMatch = clean.match(/^([a-zA-Z_]\w*)\.dech\s*=\s*([a-zA-Z_]\w*);?$/);
         if (dechMatch) {
             let varName = dechMatch[1];
             let newType = dechMatch[2];
             if (memory.hasOwnProperty(varName)) {
-                typeOverrides[varName] = newType; // Overrides the reported type!
+                typeOverrides[varName] = newType; 
             } else {
                 output += `<span class="error-text">Reference Error: '${varName}' not defined.</span>\n`;
             }
@@ -431,13 +442,12 @@ function engineExecute(code) {
         if (clean.startsWith("if ") && clean.endsWith(":")) {
             let condition = clean.substring(3, clean.length - 1).trim();
             let evalString = condition;
-            let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
             
-            keys.forEach(k => { 
-                if (!regexCache[k]) { regexCache[k] = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g'); }
-                evalString = evalString.replace(regexCache[k], (match, isString) => {
+            memoryKeys.forEach(k => { 
+                evalString = evalString.replace(memoryRegexes[k], (match, isString) => {
                     if (isString) return match;
-                    return typeof memory[k] === 'string' ? `"${memory[k]}"` : JSON.stringify(memory[k]);
+                    let val = memory[k];
+                    return typeof val === 'string' ? `"${val.replace(/"/g, '\\"')}"` : JSON.stringify(val);
                 });
             });
             
@@ -494,41 +504,36 @@ function engineExecute(code) {
                 continue;
             }
 
-            if (varValue.startsWith('"') && varValue.endsWith('"')) {
-                memory[targetVar] = varValue.slice(1, -1).replace(/\\"/g, '"'); 
-            } 
-            else if (varValue === "true" || varValue === "false") {
-                memory[targetVar] = (varValue === "true");
-            }
+            if (varValue.startsWith('"') && varValue.endsWith('"')) { memory[targetVar] = varValue.slice(1, -1).replace(/\\"/g, '"'); } 
+            else if (varValue.startsWith("'") && varValue.endsWith("'")) { memory[targetVar] = varValue.slice(1, -1).replace(/\\'/g, "'"); }
+            else if (varValue.startsWith("`") && varValue.endsWith("`")) { memory[targetVar] = varValue.slice(1, -1).replace(/\\`/g, "`").replace(/\\n/g, '\n'); }
+            else if (varValue === "true" || varValue === "false") { memory[targetVar] = (varValue === "true"); }
             else if (varValue.startsWith('[') && varValue.endsWith(']')) {
                 try { 
                     let jsonSafe = varValue.replace(/(?:^|\[|,)\s*'([^'\\]*(?:\\.[^'\\]*)*)'\s*(?=\]|,)/g, function(m, p1) { return m.replace(/'/g, '"'); });
                     memory[targetVar] = JSON.parse(jsonSafe); 
-                } catch(e) { 
-                    output += `<span class="error-text">Array Syntax Error in 'not'.</span>\n`; 
-                }
+                } catch(e) { output += `<span class="error-text">Array Syntax Error in 'not'.</span>\n`; }
             } 
             else {
                 let evalString = varValue;
-                let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
-                
-                keys.forEach(k => { 
-                    if (!regexCache[k]) { regexCache[k] = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g'); }
-                    evalString = evalString.replace(regexCache[k], (match, isString) => {
+                memoryKeys.forEach(k => { 
+                    evalString = evalString.replace(memoryRegexes[k], (match, isString) => {
                         if (isString) return match;
-                        return typeof memory[k] === 'string' ? `"${memory[k]}"` : JSON.stringify(memory[k]);
+                        let val = memory[k];
+                        return typeof val === 'string' ? `"${val.replace(/"/g, '\\"')}"` : JSON.stringify(val);
                     });
                 });
                 
-                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%]+$/.test(evalString) && evalString !== "") {
+                // NEW SECURE STRING CHECK
+                let securityCheck = evalString.replace(/(["'`]).*?\1/g, '""');
+                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%\"\'\`]*$/.test(securityCheck) && evalString !== "") {
                     try { memory[targetVar] = new Function('return ' + evalString)(); } 
                     catch (e) { output += `<span class="error-text">Math/Logic Error in 'not' variable '${targetVar}'</span>\n`; }
-                } else if (/^".*"$/.test(evalString)) {
-                    memory[targetVar] = evalString.slice(1, -1);
                 } else { 
                     output += `<span class="error-text">Syntax Error: unsupported value in 'not'</span>\n`; 
                 }
             }
+            updateMemoryCache();
             lastVar = targetVar; 
             continue; 
         }
@@ -559,41 +564,36 @@ function engineExecute(code) {
                 continue;
             }
 
-            if (varValue.startsWith('"') && varValue.endsWith('"')) {
-                memory[varName] = varValue.slice(1, -1).replace(/\\"/g, '"'); 
-            } 
-            else if (varValue === "true" || varValue === "false") {
-                memory[varName] = (varValue === "true");
-            }
+            if (varValue.startsWith('"') && varValue.endsWith('"')) { memory[varName] = varValue.slice(1, -1).replace(/\\"/g, '"'); } 
+            else if (varValue.startsWith("'") && varValue.endsWith("'")) { memory[varName] = varValue.slice(1, -1).replace(/\\'/g, "'"); }
+            else if (varValue.startsWith("`") && varValue.endsWith("`")) { memory[varName] = varValue.slice(1, -1).replace(/\\`/g, "`").replace(/\\n/g, '\n'); }
+            else if (varValue === "true" || varValue === "false") { memory[varName] = (varValue === "true"); }
             else if (varValue.startsWith('[') && varValue.endsWith(']')) {
                 try { 
                     let jsonSafe = varValue.replace(/(?:^|\[|,)\s*'([^'\\]*(?:\\.[^'\\]*)*)'\s*(?=\]|,)/g, function(m, p1) { return m.replace(/'/g, '"'); });
                     memory[varName] = JSON.parse(jsonSafe); 
-                } catch(e) { 
-                    output += `<span class="error-text">Array Syntax Error: Invalid format.</span>\n`; 
-                }
+                } catch(e) { output += `<span class="error-text">Array Syntax Error: Invalid format.</span>\n`; }
             } 
             else {
                 let evalString = varValue;
-                let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
-                
-                keys.forEach(k => { 
-                    if (!regexCache[k]) { regexCache[k] = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g'); }
-                    evalString = evalString.replace(regexCache[k], (match, isString) => {
+                memoryKeys.forEach(k => { 
+                    evalString = evalString.replace(memoryRegexes[k], (match, isString) => {
                         if (isString) return match;
-                        return typeof memory[k] === 'string' ? `"${memory[k]}"` : JSON.stringify(memory[k]);
+                        let val = memory[k];
+                        return typeof val === 'string' ? `"${val.replace(/"/g, '\\"')}"` : JSON.stringify(val);
                     });
                 });
                 
-                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%]+$/.test(evalString) && evalString !== "") {
+                // NEW SECURE STRING CHECK
+                let securityCheck = evalString.replace(/(["'`]).*?\1/g, '""');
+                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%\"\'\`]*$/.test(securityCheck) && evalString !== "") {
                     try { memory[varName] = new Function('return ' + evalString)(); } 
                     catch (e) { output += `<span class="error-text">Math/Logic Error in variable '${varName}'</span>\n`; }
-                } else if (/^".*"$/.test(evalString)) {
-                    memory[varName] = evalString.slice(1, -1);
                 } else { 
                     output += `<span class="error-text">Syntax Error: unsupported value for '${varName}'</span>\n`; 
                 }
             }
+            updateMemoryCache();
             lastVar = varName; 
             continue; 
         }
@@ -613,25 +613,24 @@ function engineExecute(code) {
             let detyMatch = val.match(/^dety\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("dety ") ? [null, val.replace(/^dety\s*/, "")] : null);
             let typeMatch = val.match(/^type\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("type ") ? [null, val.replace(/^type\s*/, "")] : null);
 
-            // UPDATED 'DETY' LOGIC
             if (detyMatch) {
                 let varNameToCheck = detyMatch[1].trim();
                 if (memory.hasOwnProperty(varNameToCheck)) {
-                    let baseType = "";
+                    let baseType = ""; let detyName = "";
                     let memVal = memory[varNameToCheck];
-                    if (Array.isArray(memVal)) baseType = "list";
-                    else if (typeof memVal === 'boolean') baseType = "bool";
-                    else if (typeof memVal === 'number' && memVal % 1 === 0) baseType = "int"; 
-                    else if (typeof memVal === 'number' && memVal % 1 !== 0) baseType = "float";
-                    else if (typeof memVal === 'string') baseType = "str";
+                    if (Array.isArray(memVal)) { baseType = "list"; detyName = "list"; }
+                    else if (typeof memVal === 'boolean') { baseType = "bool"; detyName = "Boolean"; }
+                    else if (typeof memVal === 'number' && memVal % 1 === 0) { baseType = "int"; detyName = "intezar"; } 
+                    else if (typeof memVal === 'number' && memVal % 1 !== 0) { baseType = "float"; detyName = "floot"; }
+                    else if (typeof memVal === 'string') { baseType = "str"; detyName = "string"; }
 
                     let finalType = typeOverrides[varNameToCheck] || baseType;
-                    output += finalType + "\n";
+                    let finalDety = typeOverrides[varNameToCheck] ? (typeOverrides[varNameToCheck] === 'int' ? 'intezar' : typeOverrides[varNameToCheck] === 'float' ? 'floot' : typeOverrides[varNameToCheck] === 'str' ? 'string' : typeOverrides[varNameToCheck] === 'bool' ? 'Boolean' : finalType) : detyName;
+                    output += finalDety + "\n";
                 } else { output += `<span class="error-text">Reference Error: '${varNameToCheck}' not defined.</span>\n`; }
                 continue;
             }
 
-            // UPDATED 'TYPE' LOGIC (Outputs <class ...> format)
             if (typeMatch) {
                 let varNameToCheck = typeMatch[1].trim();
                 if (memory.hasOwnProperty(varNameToCheck)) {
@@ -644,17 +643,16 @@ function engineExecute(code) {
                     else if (typeof memVal === 'string') baseType = "str";
 
                     let finalType = typeOverrides[varNameToCheck] || baseType;
-                    output += escapeHTML("<class " + finalType + ">") + "\n"; 
+                    output += escapeHTML("<class '" + finalType + "'>") + "\n"; 
                 } else { output += `<span class="error-text">Reference Error: '${varNameToCheck}' not defined.</span>\n`; }
                 continue;
             }
 
-            if (val.startsWith('"') && (!val.endsWith('"') || val === '""')) {
-                if(val === '""') { output += "\n"; } else { output += `<span class="error-text">Syntax Error: missing (").</span>\n`; }
-            } 
-            else if (val.startsWith('"') && val.endsWith('"') && val.length >= 2) {
-                let innerText = val.slice(1, -1).replace(/\\"/g, '"'); 
-                output += escapeHTML(innerText) + "\n";
+            if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'")) || (val.startsWith("`") && val.endsWith("`"))) {
+                if (val.length >= 2) {
+                    let innerText = val.slice(1, -1).replace(/\\"/g, '"').replace(/\\'/g, "'").replace(/\\`/g, "`").replace(/\\n/g, '\n'); 
+                    output += escapeHTML(innerText) + "\n";
+                }
             } 
             else if (val === "true" || val === "false") {
                 output += escapeHTML(val) + "\n";
@@ -665,24 +663,28 @@ function engineExecute(code) {
             } 
             else {
                 let evalString = val;
-                let keys = Object.keys(memory).sort((a, b) => b.length - a.length);
-                
-                keys.forEach(k => { 
-                    if (!regexCache[k]) { regexCache[k] = new RegExp('(".*?"|\'.*?\')|\\b' + k + '\\b', 'g'); }
-                    evalString = evalString.replace(regexCache[k], (match, isString) => {
+                memoryKeys.forEach(k => { 
+                    evalString = evalString.replace(memoryRegexes[k], (match, isString) => {
                         if (isString) return match; 
-                        return memory[k]; 
+                        let mVal = memory[k];
+                        return typeof mVal === 'string' ? `"${mVal.replace(/"/g, '\\"')}"` : JSON.stringify(mVal); 
                     });
                 });
 
-                let undefinedVars = evalString.match(/[a-zA-Z_]\w*/g);
+                // NEW SECURE STRING CHECK
+                let securityCheck = evalString.replace(/(["'`]).*?\1/g, '""');
+                let undefinedVars = securityCheck.match(/[a-zA-Z_]\w*/g);
+                
                 if (undefinedVars) {
                     output += `<span class="error-text">Reference Error: '${undefinedVars[0]}' is not defined.</span>\n`;
                     continue;
                 }
 
-                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%]+$/.test(evalString) && evalString !== "") {
-                    if (/[\+\-\*\/\%]{2,}/.test(evalString.replace(/\s+/g,''))) { output += `<span class="error-text">Math Error</span>\n`; } 
+                if (/^[\d\s\+\-\*\/\(\)\.\>\<\=\!\&\|\%\"\'\`]*$/.test(securityCheck) && evalString !== "") {
+                    // Check for multiple operators, but ignore empty strings logic safely
+                    if (/[\+\-\*\/\%]{2,}/.test(securityCheck.replace(/\s+|""|''|``/g,''))) { 
+                        output += `<span class="error-text">Math Error</span>\n`; 
+                    } 
                     else { 
                         try { output += new Function('return ' + evalString)() + "\n"; } 
                         catch (e) { output += `<span class="error-text">Math/Logic Error</span>\n`; } 
@@ -697,7 +699,11 @@ function engineExecute(code) {
         }
     }
     
-    return output || "Process Finished.";
+    let endTime = performance.now();
+    let speed = (endTime - startTime).toFixed(2);
+    output += `\n<span style="color:#29C254; font-weight:bold;">[execute success, ${speed}ms]</span>\n`;
+
+    return output.trim();
 }
 
 // --- EXECUTE FROM UI BUTTON ---

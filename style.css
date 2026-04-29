@@ -16,7 +16,7 @@ body {
 .ace_keyword.ace_ifelse { color: #CFAD03 !important; font-weight: bold !important; } 
 .ace_constant.ace_boolean { color: #F67500 !important; font-weight: bold !important; } 
 .ace_keyword.ace_detytype { color: #29C254 !important; font-weight: bold !important; }
-.ace_keyword.ace_dech { color: #24B7A6 !important; font-weight: bold !important; } /* NEW DECH COLOR */
+.ace_keyword.ace_dech { color: #24B7A6 !important; font-weight: bold !important; }
 .ace_keyword.ace_reserved { color: #5980F0 !important; font-weight: bold !important; } 
 .ace_string { color: #008E1D !important; }
 .ace_constant.ace_numeric { color: #2BB5D6 !important; }
