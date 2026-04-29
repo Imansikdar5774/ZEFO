@@ -23,7 +23,7 @@ function closeModal(id) {
     document.getElementById(id).style.display = 'none'; 
 }
 
-// --- VIRTUAL FILE SYSTEM LOGIC (0.0.17 FILE MANAGER) ---
+// --- VIRTUAL FILE SYSTEM LOGIC ---
 let vfs = JSON.parse(localStorage.getItem('ds_vfs')) || {};
 
 function openFileManager() {
@@ -124,9 +124,9 @@ function downloadJSFile(filename, content) {
     URL.revokeObjectURL(url);
 }
 
-// --- COMPILER (DEARSCRIPT TO JAVASCRIPT) ---
+// --- COMPILER (DEARSCRIPT TO JAVASCRIPT) v0.0.19 ---
 function convertToJS(code, isDom) {
-    let jsCode = "// Compiled from DearScript v0.0.17\n(() => {\n";
+    let jsCode = "// Compiled from DearScript v0.0.19\n(() => {\n";
     let rawCode = code.replace(/'''([\s\S]*?)'''/g, '/*$1*/').replace(/"""([\s\S]*?)"""/g, '/*$1*/');
     const lines = rawCode.split("\n");
     let indentStack = [];
@@ -264,8 +264,8 @@ ace.define('ace/mode/ds_highlight_rules', function(require, exports, module) {
                 { token: "keyword.ifelse", regex: "\\b(?:if|else)\\b" }, 
                 { token: "constant.boolean", regex: "\\b(?:true|false)\\b" }, 
                 { token: "keyword.detytype", regex: "\\b(?:type|dety)\\b" },
-                { token: "keyword.dech", regex: "\\bdech\\b" }, // UPDATED: dech specific token for #24B7A6
-                { token: "keyword.reserved", regex: "\\b(?:float|string|list|array|intezar|str|floot|Boolean|bool|int)\\b" }, // UPDATED: Added 'int'
+                { token: "keyword.dech", regex: "\\bdech\\b" }, 
+                { token: "keyword.reserved", regex: "\\b(?:float|string|list|array|intezar|str|floot|Boolean|bool|int)\\b" }, 
                 { token: "string", regex: '"(?:[^"\\\\]|\\\\.)*"' }, 
                 { token: "constant.numeric", regex: "[0-9]+" }
             ],
@@ -329,7 +329,7 @@ langTools.addCompleter({
             {name:"false", value:"false", score:1000, meta: "Boolean"},
             {name:"dety", value:"dety", score:1000, meta: "TypeCheck"},
             {name:"type", value:"type", score:1000, meta: "TypeCheck"},
-            {name:"int", value:"int", score:1000, meta: "Reserved"}, // UPDATED: Added 'int'
+            {name:"int", value:"int", score:1000, meta: "Reserved"}, 
             {name:"float", value:"float", score:1000, meta: "Reserved"},
             {name:"string", value:"string", score:1000, meta: "Reserved"},
             {name:"list", value:"list", score:1000, meta: "Reserved"},
@@ -381,14 +381,14 @@ function removeInlineComments(text) {
     return text.replace(/(".*?"|'.*?')|(\/\/.*|#.*)/g, (match, stringLiteral) => stringLiteral ? stringLiteral : "").trimEnd();
 }
 
-// --- THE MASTER DEARSCRIPT ENGINE v0.0.17 ---
+// --- THE MASTER DEARSCRIPT ENGINE v0.0.19 ---
 function engineExecute(code) {
     let rawCode = code.replace(/"""[\s\S]*?"""/g, '').replace(/'''[\s\S]*?'''/g, '');
     const lines = rawCode.split("\n");
     let output = ""; 
     let memory = {};
     let typeOverrides = {}; // TRACKS SPOOFED DATA TYPES
-    const reservedKw = ["bik", "mi", "not", "dety", "type", "dech", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "int", "if", "else", "true", "false"]; // UPDATED: 'int' added
+    const reservedKw = ["bik", "mi", "not", "dety", "type", "dech", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "int", "if", "else", "true", "false"];
     
     let skipMode = false;
     let baseIndent = 0;
@@ -613,6 +613,7 @@ function engineExecute(code) {
             let detyMatch = val.match(/^dety\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("dety ") ? [null, val.replace(/^dety\s*/, "")] : null);
             let typeMatch = val.match(/^type\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("type ") ? [null, val.replace(/^type\s*/, "")] : null);
 
+            // UPDATED 'DETY' LOGIC
             if (detyMatch) {
                 let varNameToCheck = detyMatch[1].trim();
                 if (memory.hasOwnProperty(varNameToCheck)) {
@@ -630,6 +631,7 @@ function engineExecute(code) {
                 continue;
             }
 
+            // UPDATED 'TYPE' LOGIC (Outputs <class ...> format)
             if (typeMatch) {
                 let varNameToCheck = typeMatch[1].trim();
                 if (memory.hasOwnProperty(varNameToCheck)) {
