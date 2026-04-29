@@ -154,11 +154,11 @@ function convertToJS(code, isDom) {
         } else if (clean === "else:") {
             if (indentStack.length > 0) { jsCode += "    ".repeat(indentStack.length) + "} else {\n"; } 
             else { jsCode += "    } else {\n"; }
-        } else if (clean.match(/^[a-zA-Z_]\w*\.dech\s*=\s*\w+;?$/)) { // NEW DECH COMPILER LOGIC
+        } else if (clean.match(/^[a-zA-Z_]\w*\.dech\s*=\s*\w+;?$/)) { 
             jsCode += "    ".repeat(indentStack.length + 1) + "// " + clean + " (Type spoofing handled in DearScript Engine)\n";
         } else if (clean.startsWith("mi ")) {
             let eqIdx = clean.indexOf('=');
-            if (eqIdx !== -1) { lastVar = clean.substring(3, eqIdx).trim(); } // Store last var name
+            if (eqIdx !== -1) { lastVar = clean.substring(3, eqIdx).trim(); } 
             jsCode += "    ".repeat(indentStack.length + 1) + clean.replace(/^mi\s+/, "let ") + "\n";
         } else if (clean.startsWith("not ") || clean.startsWith("not=")) { 
             let cleanNot = clean.substring(3).trim();
@@ -263,8 +263,9 @@ ace.define('ace/mode/ds_highlight_rules', function(require, exports, module) {
                 { token: "keyword.mi", regex: "\\b(?:mi|not)\\b" }, 
                 { token: "keyword.ifelse", regex: "\\b(?:if|else)\\b" }, 
                 { token: "constant.boolean", regex: "\\b(?:true|false)\\b" }, 
-                { token: "keyword.detytype", regex: "\\b(?:type|dety|dech)\\b" }, // UPDATED: ADDED 'dech'
-                { token: "keyword.reserved", regex: "\\b(?:float|string|list|array|intezar|str|floot|Boolean|bool)\\b" }, 
+                { token: "keyword.detytype", regex: "\\b(?:type|dety)\\b" },
+                { token: "keyword.dech", regex: "\\bdech\\b" }, // UPDATED: dech specific token for #24B7A6
+                { token: "keyword.reserved", regex: "\\b(?:float|string|list|array|intezar|str|floot|Boolean|bool|int)\\b" }, // UPDATED: Added 'int'
                 { token: "string", regex: '"(?:[^"\\\\]|\\\\.)*"' }, 
                 { token: "constant.numeric", regex: "[0-9]+" }
             ],
@@ -321,13 +322,14 @@ langTools.addCompleter({
             {name:"bik", value:"bik", score:1000, meta: "Print"}, 
             {name:"mi", value:"mi", score:1000, meta: "Variable"},
             {name:"not", value:"not", score:1000, meta: "Reassign"}, 
-            {name:"dech", value:"dech", score:1000, meta: "TypeCast"}, // UPDATED: ADDED 'dech'
+            {name:"dech", value:"dech", score:1000, meta: "TypeCast"}, 
             {name:"if", value:"if", score:1000, meta: "Condition"},
             {name:"else:", value:"else:", score:1000, meta: "Condition"},
             {name:"true", value:"true", score:1000, meta: "Boolean"},
             {name:"false", value:"false", score:1000, meta: "Boolean"},
             {name:"dety", value:"dety", score:1000, meta: "TypeCheck"},
             {name:"type", value:"type", score:1000, meta: "TypeCheck"},
+            {name:"int", value:"int", score:1000, meta: "Reserved"}, // UPDATED: Added 'int'
             {name:"float", value:"float", score:1000, meta: "Reserved"},
             {name:"string", value:"string", score:1000, meta: "Reserved"},
             {name:"list", value:"list", score:1000, meta: "Reserved"},
@@ -362,7 +364,7 @@ editor.session.on('change', function() {
         if ((clean.startsWith('not ') || clean.startsWith('not=')) && !clean.endsWith(';')) {
             annotations.push({ row: i, column: 0, text: "Syntax Error: missing (;) at the end of 'not' statement.", type: "error" });
         }
-        // Check missing semi-colon for .dech (NEW LINTER RULE)
+        // Check missing semi-colon for .dech
         if (clean.match(/^[a-zA-Z_]\w*\.dech\s*=/) && !clean.endsWith(';')) {
             annotations.push({ row: i, column: 0, text: "Syntax Error: missing (;) at the end of .dech statement.", type: "error" });
         }
@@ -385,8 +387,8 @@ function engineExecute(code) {
     const lines = rawCode.split("\n");
     let output = ""; 
     let memory = {};
-    let typeOverrides = {}; // NEW: TRACKS SPOOFED DATA TYPES
-    const reservedKw = ["bik", "mi", "not", "dety", "type", "dech", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "if", "else", "true", "false"];
+    let typeOverrides = {}; // TRACKS SPOOFED DATA TYPES
+    const reservedKw = ["bik", "mi", "not", "dety", "type", "dech", "float", "string", "list", "array", "intezar", "str", "floot", "Boolean", "bool", "int", "if", "else", "true", "false"]; // UPDATED: 'int' added
     
     let skipMode = false;
     let baseIndent = 0;
@@ -611,7 +613,6 @@ function engineExecute(code) {
             let detyMatch = val.match(/^dety\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("dety ") ? [null, val.replace(/^dety\s*/, "")] : null);
             let typeMatch = val.match(/^type\s*\(\s*(.*?)\s*\)$/) || (val.startsWith("type ") ? [null, val.replace(/^type\s*/, "")] : null);
 
-            // UPDATED 'DETY' LOGIC (Checks typeOverrides first)
             if (detyMatch) {
                 let varNameToCheck = detyMatch[1].trim();
                 if (memory.hasOwnProperty(varNameToCheck)) {
@@ -619,7 +620,7 @@ function engineExecute(code) {
                     let memVal = memory[varNameToCheck];
                     if (Array.isArray(memVal)) baseType = "list";
                     else if (typeof memVal === 'boolean') baseType = "bool";
-                    else if (typeof memVal === 'number' && memVal % 1 === 0) baseType = "int"; // "int" as requested
+                    else if (typeof memVal === 'number' && memVal % 1 === 0) baseType = "int"; 
                     else if (typeof memVal === 'number' && memVal % 1 !== 0) baseType = "float";
                     else if (typeof memVal === 'string') baseType = "str";
 
@@ -629,7 +630,6 @@ function engineExecute(code) {
                 continue;
             }
 
-            // UPDATED 'TYPE' LOGIC (Outputs <class int> format and checks typeOverrides)
             if (typeMatch) {
                 let varNameToCheck = typeMatch[1].trim();
                 if (memory.hasOwnProperty(varNameToCheck)) {
@@ -642,7 +642,7 @@ function engineExecute(code) {
                     else if (typeof memVal === 'string') baseType = "str";
 
                     let finalType = typeOverrides[varNameToCheck] || baseType;
-                    output += escapeHTML("<class " + finalType + ">") + "\n"; // Escapes tags perfectly for HTML view
+                    output += escapeHTML("<class " + finalType + ">") + "\n"; 
                 } else { output += `<span class="error-text">Reference Error: '${varNameToCheck}' not defined.</span>\n`; }
                 continue;
             }

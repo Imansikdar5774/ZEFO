@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DearScript Official IDE - 0.0.15 Beta</title>
+    <title>DearScript Official IDE - 0.0.17 Beta</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -49,7 +49,7 @@
 
     <div id="cli-modal">
         <div class="cli-header">
-            <span style="color:#C805F5; font-weight:bold;">DearScript OS Terminal v0.0.15</span>
+            <span style="color:#C805F5; font-weight:bold;">DearScript OS Terminal v0.0.17</span>
             <button onclick="document.getElementById('cli-modal').style.display='none'" style="background:#ff5555; color:white; border:none; padding:5px 10px; cursor:pointer; font-weight:bold;">EXIT</button>
         </div>
         <div id="cli-output">Welcome to DearScript OS. File system initialized.<br>Type 'ls' to see files. Type 'ds filename.ds' to run.<br>Compile to JS using 'ds filename.ds convert js'</div>
@@ -161,6 +161,18 @@
         </div>
 
         <div class="docs-section">
+            <span class="history-version">0.0.17 beta (THE TYPE SPOOFING UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Type Spoofing (.dech):</strong> Change the reported data type of any variable without modifying its actual value (e.g. <code>x.dech = int;</code>).</li>
+                <li><strong>New Data Type Keyword:</strong> Added <code>int</code> to autocomplete and syntax highlighting (Blue).</li>
+                <li><strong>Custom Coloring:</strong> `dech` keyword now highlighted in custom Teal (#24B7A6).</li>
+            </ul>
+
+            <span class="history-version">0.0.16 beta (THE ANONYMOUS VAR UPDATE):</span>
+            <ul class="history-list">
+                <li><strong>Anonymous Reassignment:</strong> Introduced the <code>not</code> keyword. Allows updating the last created variable's value instantly without typing its name (e.g., <code>not = "new value";</code>).</li>
+            </ul>
+
             <span class="history-version">0.0.15 beta (THE UX & LINTER UPDATE):</span>
             <ul class="history-list">
                 <li><strong>Error Linter:</strong> Real-time syntax checker added. Forgetting a <code>;</code> or <code>:</code> now shows a red <code>(!)</code> in the editor margin!</li>

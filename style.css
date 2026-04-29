@@ -16,19 +16,19 @@ body {
 .ace_keyword.ace_ifelse { color: #CFAD03 !important; font-weight: bold !important; } 
 .ace_constant.ace_boolean { color: #F67500 !important; font-weight: bold !important; } 
 .ace_keyword.ace_detytype { color: #29C254 !important; font-weight: bold !important; }
+.ace_keyword.ace_dech { color: #24B7A6 !important; font-weight: bold !important; } /* NEW DECH COLOR */
 .ace_keyword.ace_reserved { color: #5980F0 !important; font-weight: bold !important; } 
 .ace_string { color: #008E1D !important; }
 .ace_constant.ace_numeric { color: #2BB5D6 !important; }
 .ace_comment { color: #323D55 !important; font-style: italic !important; }
 
-/* --- PREMIUM AUTOCOMPLETE STYLING (FIXED GREEN ISSUE) --- */
+/* --- PREMIUM AUTOCOMPLETE STYLING --- */
 .ace_editor.ace_autocomplete {
     background-color: #1e1f29 !important;
     color: #f8f8f2 !important;
     border: 1px solid #C805F5 !important;
     box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
 }
-/* Yeh raha background color fix */
 .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
     background-color: #5980F0 !important; 
     opacity: 0.4;
