@@ -94,7 +94,7 @@ body {
 #terminal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #282a36; color: #FFFFFF; padding: 20px; display: none;
-    flex-direction: column; z-index: 2000;
+    flex-direction: column; z-index: 2000; overflow: scroll;
 }
 #out { 
     font-size: 22px; font-family: monospace; white-space: pre-wrap; margin-top: 15px; 
@@ -173,3 +173,4 @@ li { margin-bottom: 15px; color: #e2e2e2; }
 .fm-list { display: flex; flex-direction: column; gap: 10px; }
 .fm-item { background: #1e1f29; padding: 15px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #323D55;}
 .fm-item-name { font-weight: bold; color: #50fa7b; cursor: pointer; }
+
